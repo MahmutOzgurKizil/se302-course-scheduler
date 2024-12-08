@@ -22,7 +22,7 @@ public class Database {
             dbDir.mkdirs();
         }
         File dbFile = new File(dbPath + File.separator + "lectures.db");
-        if(!dbDir.exists()) {
+        if(!dbFile.exists()) {
             // SQL commands to create tables
             String createCoursesTable = """
             CREATE TABLE Courses (
