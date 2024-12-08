@@ -5,17 +5,23 @@ package team_nine.course_scheduler;
 // The usage of the database is "Database.createAndConnectToDatabase()" etc.
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Database {
-    private static final String dbPath = System.getProperty("user.home") + File.separator + "Documents" + File.separator + "CourseSchedulerDatabase";
-    private static final String URL = "jdbc:sqlite:" + dbPath + File.separator + "lectures.db";
-    private static Connection conn = null;
+    private final String dbPath = System.getProperty("user.home") + File.separator + "Documents" + File.separator + "CourseSchedulerDatabase";
+    private final String URL = "jdbc:sqlite:" + dbPath + File.separator + "lectures.db";
+    private Connection conn;
 
-    private static void createAndConnectToDatabase() {
+    public Database() {
+        createAndConnectToDatabase();
+        try {
+            conn = DriverManager.getConnection(URL);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createAndConnectToDatabase() {
 
         File dbDir = new File(dbPath);
         if(!dbDir.exists()) {
@@ -81,7 +87,7 @@ public class Database {
 
     }
 
-    public static void addCourse(String course, String timeToStart, int duration, String lecturer, String[] students) {
+    public void addCourse(String course, String timeToStart, int duration, String lecturer, String[] students) {
         try {
             PreparedStatement insertCourse = conn.prepareStatement("""
                 INSERT INTO Courses (course, time_to_start, duration, lecturer)
@@ -119,7 +125,7 @@ public class Database {
         }
     }
 
-    public static void changeClassroom(String course, String classroom) {
+    public void changeClassroom(String course, String classroom) {
         try {
             PreparedStatement updateAllocated = conn.prepareStatement("""
                 UPDATE Allocated
@@ -137,7 +143,7 @@ public class Database {
         }
     }
 
-    public static void matchClassroom(String course, String classroom) {
+    public void matchClassroom(String course, String classroom) {
         try {
             PreparedStatement insertAllocated = conn.prepareStatement("""
                 INSERT INTO Allocated (course, classroom)
@@ -154,32 +160,10 @@ public class Database {
         }
     }
 
-    // YAPILACAK
-    public static String getClassroomOfCourse(String name) {
-        try {
-            PreparedStatement getClassroom = conn.prepareStatement("""
-                SELECT classroom
-                FROM Allocated
-                WHERE course = ?;
-            """);
-            getClassroom.setString(1, name);
-            getClassroom.execute();
-            return getClassroom.getResultSet().getString("classroom");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-
-
-    public static void addStudent(String course, String[] students) {
+    public void addStudent(String course, String[] students) {
         try {
             PreparedStatement insertStudent = conn.prepareStatement("""
-                INSERT INTO Students (name)
-                VALUES (?)
-                WHERE NOT EXISTS (SELECT 1 FROM Students WHERE name = ?);
+                INSERT OR IGNORE INTO Students (name) VALUES (?);
             """);
 
             PreparedStatement insertEnrollment = conn.prepareStatement("""
@@ -189,7 +173,6 @@ public class Database {
 
             for (String student: students) {
                 insertStudent.setString(1, student);
-                insertStudent.setString(2, student);
 
                 insertEnrollment.setString(1, course);
                 insertEnrollment.setString(2, student);
@@ -203,7 +186,7 @@ public class Database {
         }
     }
 
-    public static void removeStudent(String course, String student) {
+    public void removeStudent(String course, String student) {
         try {
             PreparedStatement deleteEnrollment = conn.prepareStatement("""
                 DELETE FROM Enrollments
@@ -221,4 +204,35 @@ public class Database {
         }
     }
 
+    public String getClassroomOfCourse(String course) {
+        try {
+            PreparedStatement getClassroom = conn.prepareStatement("""
+                SELECT classroom
+                FROM Allocated
+                WHERE course = ?;
+            """);
+            getClassroom.setString(1, course);
+            getClassroom.execute();
+            return getClassroom.getResultSet().getString("classroom");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getTimeToStartOfCourse(String course) {
+        try {
+            PreparedStatement getTimeToStart = conn.prepareStatement("""
+                SELECT time_to_start
+                FROM Courses
+                WHERE course = ?;
+            """);
+            getTimeToStart.setString(1, course);
+            getTimeToStart.execute();
+            return getTimeToStart.getResultSet().getString("time_to_start");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
