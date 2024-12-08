@@ -5,7 +5,9 @@ package team_nine.course_scheduler;
 // The usage of the database is "Database.createAndConnectToDatabase()" etc.
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.*;
+import java.util.Scanner;
 
 public class Database {
     private final String dbPath = System.getProperty("user.home") + File.separator + "Documents" + File.separator + "CourseSchedulerDatabase";
@@ -235,4 +237,53 @@ public class Database {
         }
         return null;
     }
+
+    public void populateCourses(File file) {
+        try {
+            Scanner sc = new Scanner(file);
+            sc.nextLine(); // Skip the header
+            while (sc.hasNextLine()) {
+                String[] line = sc.nextLine().split(";");
+                String[] students = new String[line.length - 4];
+                System.arraycopy(line, 4, students, 0, line.length - 4);
+                addCourse(line[0], line[1], Integer.parseInt(line[2]), line[3], students);
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void populateClassrooms(File file) {
+        try {
+            Scanner sc = new Scanner(file);
+            sc.nextLine(); // Skip the header
+            while (sc.hasNextLine()) {
+                String[] line = sc.nextLine().split(";");
+                addClassroom(line[0], Integer.parseInt(line[1]));
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void addClassroom(String s, int i) {
+        try {
+            PreparedStatement insertClassroom = conn.prepareStatement("""
+                INSERT INTO Classrooms (classroom, capacity)
+                VALUES (?, ?);
+            """);
+
+            insertClassroom.setString(1, s);
+            insertClassroom.setInt(2, i);
+            insertClassroom.execute();
+            System.out.println("Classroom added successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
