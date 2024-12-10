@@ -7,6 +7,7 @@ package team_nine.course_scheduler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Database {
@@ -213,6 +214,48 @@ public class Database {
             System.out.println("Classroom added successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static Course[] getAllCourses() {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM Courses;")) {
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                courses.add(new Course(rs.getString("course"), rs.getString("time_to_start"), rs.getString("lecturer"), rs.getInt("duration")));
+            }
+            return courses.toArray(new Course[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Course[0];
+        }
+    }
+
+    public static Student[] getAllStudents() {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM Students;")) {
+            ArrayList<Student> students = new ArrayList<>();
+            while (rs.next()) {
+                students.add(new Student(rs.getString("name")));
+            }
+            return students.toArray(new Student[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Student[0];
+        }
+    }
+
+    public static Classroom[] getAllClassrooms() {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM Classrooms;")) {
+            ArrayList<Classroom> classrooms = new ArrayList<>();
+            while (rs.next()) {
+                classrooms.add(new Classroom(rs.getString("classroom"), rs.getInt("capacity")));
+            }
+            return classrooms.toArray(new Classroom[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Classroom[0];
         }
     }
 }
