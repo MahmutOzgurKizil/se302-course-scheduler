@@ -258,4 +258,17 @@ public class Database {
             return new Classroom[0];
         }
     }
+
+    public static String getAllocatedClassroom(String course) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+                SELECT classroom FROM Allocated WHERE course = ?;
+            """)) {
+            stmt.setString(1, course);
+            ResultSet rs = stmt.executeQuery();
+            return rs.getString("classroom");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
