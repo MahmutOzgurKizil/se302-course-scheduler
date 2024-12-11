@@ -27,7 +27,15 @@ public class Course {
     public void setTime_to_start(String time_to_start) {this.time_to_start = time_to_start;}
 
     public void autoAssign(Course course){
-
+        Classroom[] PotentialClasses = Database.getAllClassrooms();
+        for(Classroom c : PotentialClasses){
+            if(Database.getAvailability(c,course.time_to_start)){
+                Database.changeClassroom(course.course,c.getClassroom());
+                System.out.println("Course succesfully added to classroom: " + c.getClassroom() + " at time: "+course.time_to_start);
+                return;
+            }
+            System.out.println("All Classrooms are occupied");
+        }
     }
 
     public void manualAssign(Course course, Classroom classroom){
