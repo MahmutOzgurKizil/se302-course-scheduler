@@ -24,7 +24,7 @@ public class Database {
         }
     }
 
-    private static void createAndConnectToDatabase() {
+    public static void createAndConnectToDatabase() {
         File dbDir = new File(dbPath);
         if (!dbDir.exists()) dbDir.mkdirs();
 
