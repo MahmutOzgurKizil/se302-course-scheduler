@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane minHeight="300.0" minWidth="300.0" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="team_nine.course_scheduler.MainController">
+<AnchorPane minHeight="300.0" minWidth="300.0" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="team_nine.course_scheduler.MainController">
    <children>
       <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <ToolBar>
               <items>
                 <Button fx:id="studentsListButton" mnemonicParsing="false" onAction="#onStudentsListButtonClick" text="Students" />
-                  <Button fx:id="lecturersListButton" mnemonicParsing="false" text="Lecturers" />
+                  <Button fx:id="lecturersListButton" mnemonicParsing="false" onAction="#onLecturersListButtonClick" text="Lecturers" />
                   <Separator orientation="VERTICAL" />
                   <MenuButton fx:id="actionsMenuButton" mnemonicParsing="false" text="Actions">
                     <items>
@@ -32,10 +23,10 @@
                         </Menu>
                       <MenuItem fx:id="importCsvMenuItem" mnemonicParsing="false" text="Import CSV File" />
                       <MenuItem fx:id="addDeleteStudentMenuItem" mnemonicParsing="false" text="Add/Delete Student" />
-                        <MenuItem fx:id="addNewCourseMenuItem" mnemonicParsing="false" text="Add New Course" />
+                        <MenuItem fx:id="addNewCourseMenuItem" mnemonicParsing="false" onAction="#onAddNewCourseClick" text="Add New Course" />
                     </items>
                   </MenuButton>
-                  <Button fx:id="helpButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Help" />
+                  <Button fx:id="helpButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onHelpButtonClick" text="Help" />
               </items>
             </ToolBar>
             <SplitPane dividerPositions="0.500253807106599" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
