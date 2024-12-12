@@ -258,4 +258,18 @@ public class Database {
             return new Classroom[0];
         }
     }
+
+    public static String[] getAllLecturers() {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT DISTINCT lecturer FROM Courses;")) {
+            ArrayList<String> lecturers = new ArrayList<>();
+            while (rs.next()) {
+                lecturers.add(rs.getString("lecturer"));
+            }
+            return lecturers.toArray(new String[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new String[0];
+        }
+    }
 }
