@@ -1,6 +1,5 @@
 package team_nine.course_scheduler;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 
 public class Course {
@@ -28,6 +27,15 @@ public class Course {
     public void setTime_to_start(String time_to_start) {this.time_to_start = time_to_start;}
 
     public void autoAssign(Course course){
+        Classroom[] PotentialClasses = Database.getAllClassrooms();
+        for(Classroom c : PotentialClasses){
+            if(Database.getAvailability(c,course.time_to_start)){
+                Database.changeClassroom(course.course,c.getClassroom());
+                System.out.println("Course succesfully added to classroom: " + c.getClassroom() + " at time: "+course.time_to_start);
+                return;
+            }
+            System.out.println("All Classrooms are occupied");
+        }
     }
 
     public void manualAssign(Course course, Classroom classroom){
@@ -40,20 +48,9 @@ public class Course {
     }
 
 
+    public void switchClassrooms(Course OtherCourse, Classroom DesiredClassroom){
 
-    public void switchClassrooms(Course otherCourse, Classroom desiredClassroom) {
-
-            String current = Database.getAllocatedClassroom(this.course);
-            String theClassroom = Database.getAllocatedClassroom(otherCourse.getCourse());
-
-            if (theClassroom != null && theClassroom.equals(desiredClassroom.getClassroom())) {
-                System.out.println("Desired classroom is in use.");
-                return;
-            }
-            Database.changeClassroom(this.course, desiredClassroom.getClassroom());
     }
-
-
 
     public void addStudents(ArrayList<Student> students){
         String[] EnrolledStudents = new  String[students.size()];

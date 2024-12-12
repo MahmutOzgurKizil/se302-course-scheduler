@@ -271,4 +271,20 @@ public class Database {
             return null;
         }
     }
+
+    public static boolean getAvailability(Classroom classroom, String DesiredTime) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+                SELECT time_to_start, duration FROM Courses WHERE classroom_name = ? AND ? BETWEEN time_to_start AND DATE_ADD(time_to_start, INTERVAL duration MINUTE) 
+                """)) {
+            stmt.setString(1, classroom.getClassroom());
+            stmt.setString(2, DesiredTime);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) { return false; }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
 }
