@@ -287,4 +287,16 @@ public class Database {
         }
         return true;
     }
+
+    public static int getCapacity(Classroom classroom){
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT capacity FROM Classrooms WHERE classroom_name = ?
+            """)){
+            stmt.setString(1,classroom.getClassroom());
+            ResultSet rs = stmt.executeQuery();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
