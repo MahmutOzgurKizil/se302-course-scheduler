@@ -49,7 +49,14 @@ public class Course {
 
 
     public void switchClassrooms(Course OtherCourse, Classroom DesiredClassroom){
+        String current = Database.getAllocatedClassroom(this.course);
+        String theClassroom = Database.getAllocatedClassroom(OtherCourse.getCourse());
 
+        if (theClassroom != null && Database.getAvailability(DesiredClassroom, OtherCourse.getTime_to_start()) ) {
+            System.out.println("Desired classroom is in use.");
+            return;
+        }
+        Database.changeClassroom(this.course, DesiredClassroom.getClassroom());
     }
 
     public void addStudents(ArrayList<Student> students){
