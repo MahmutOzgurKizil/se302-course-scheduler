@@ -75,6 +75,40 @@ public class MainController {
     @FXML
     private TextField courseHourTextField;
 
+    @FXML
+    public void initialize() {
+        courseName.setCellValueFactory(new PropertyValueFactory<>("course"));
+        courseStartTime.setCellValueFactory(new PropertyValueFactory<>("time_to_start"));
+        courseDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
+        courseLecturer.setCellValueFactory(new PropertyValueFactory<>("lecturer"));
+
+        ObservableList<Course> courses = FXCollections.observableArrayList(Database.getAllCourses());
+        courseTableView.setItems(courses);
+
+        ObservableList<Classroom> classrooms = FXCollections.observableArrayList(Database.getAllClassrooms());
+        classroomNameColumn.setCellValueFactory(new PropertyValueFactory<>("classroom"));
+        classroomCapacityColumn.setCellValueFactory(new PropertyValueFactory<>("capacity"));
+        classroomTableView.setItems(classrooms);
+
+    }
+
+    @FXML
+    public void openCourseInfo() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("CourseInfoPanel.fxml"));
+            Stage courseInfoStage = new Stage();
+            courseInfoStage.setTitle("Course Info");
+            courseInfoStage.setScene(new Scene(loader.load()));
+
+
+            CourseInfoPanelController controller = loader.getController();
+            controller.initialize((Course) courseTableView.getSelectionModel().getSelectedItem());
+
+            courseInfoStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     public void initializeStudentList() {

@@ -86,7 +86,7 @@ public class Database {
                 VALUES (?, ?, ?, ?);
             """);
              PreparedStatement insertStudent = conn.prepareStatement("""
-                INSERT INTO Students (name)
+                INSERT OR IGNORE INTO Students (name)
                 VALUES (?);
             """);
              PreparedStatement insertEnrollment = conn.prepareStatement("""
@@ -267,6 +267,28 @@ public class Database {
                 lecturers.add(rs.getString("lecturer"));
             }
             return lecturers.toArray(new String[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new String[0];
+        }
+    }
+
+    public static String[] getStudentsInCourse(String course) {
+        System.out.println("Fetching students for course: " + course); // Debugging line
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT student_name
+            FROM Enrollments
+            WHERE TRIM(course) = ?;
+        """)) {
+            stmt.setString(1, course);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<String> students = new ArrayList<>();
+            while (rs.next()) {
+                String studentName = rs.getString("student_name");
+                System.out.println("Found student: " + studentName); // Debugging line
+                students.add(studentName);
+            }
+            return students.toArray(new String[0]);
         } catch (SQLException e) {
             e.printStackTrace();
             return new String[0];

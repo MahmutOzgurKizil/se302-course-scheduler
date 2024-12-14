@@ -14,7 +14,7 @@ public class Course {
     private int duration;
 
     //Course Constructor
-    public Course(String time_to_start, String course, String lecturer, int duration) {
+    public Course(String course, String time_to_start, String lecturer, int duration) {
         this.course = course;
         this.time_to_start = time_to_start;
         this.duration = duration;

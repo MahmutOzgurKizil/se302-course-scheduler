@@ -6,13 +6,19 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/team_nine/course_scheduler/MainWindow.fxml"));
+        Database.populateCourses(new File("/Users/ozgurkizil/Desktop/Courses.csv"));
+        Database.populateClassrooms(new File("/Users/ozgurkizil/Desktop/ClassroomCapacity.csv"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
         Parent root = loader.load();
+        MainController controller = loader.getController();
+        controller.initialize();
+
         stage.setTitle("Main Window");
         stage.setScene(new Scene(root));
         stage.show();
