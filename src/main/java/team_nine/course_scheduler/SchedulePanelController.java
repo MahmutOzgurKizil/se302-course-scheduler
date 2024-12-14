@@ -5,6 +5,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 public class SchedulePanelController {
@@ -78,32 +79,39 @@ public class SchedulePanelController {
     public void initializeForStudent(String student) {
         initialize("%s Schedule".formatted(student));
         Course[] courses = Database.getCoursesForStudent(student);
-        for (Course course : courses) {
-            Course courseInfo = Database.getCourse(course.getCourse());
-            String date_time = courseInfo.getTime_to_start();
-            String[] date_time_split = date_time.split(" ");
-            int day = Day.valueOf(date_time_split[0].toUpperCase()).getValue();
-            int time = Hour.fromTime(date_time_split[1]).getOrder();
-            for (int i = 0; i < courseInfo.getDuration(); i++) {
-                Text courseText = new Text(" "+courseInfo.getCourse());
-                gridPane.add(courseText, day, time + i);
-            }
-        }
+        createWeeklySchedule(courses);
     }
+
 
     public void initializeForLecturer(String lecturer) {
         initialize("%s Schedule".formatted(lecturer));
         Course[] courses = Database.getCoursesForLecturer(lecturer);
+        createWeeklySchedule(courses);
+    }
+
+    private void createWeeklySchedule(Course[] courses) {
         for (Course course : courses) {
             Course courseInfo = Database.getCourse(course.getCourse());
             String date_time = courseInfo.getTime_to_start();
             String[] date_time_split = date_time.split(" ");
             int day = Day.valueOf(date_time_split[0].toUpperCase()).getValue();
             int time = Hour.fromTime(date_time_split[1]).getOrder();
+            String rdColor = getRandomColor();
             for (int i = 0; i < courseInfo.getDuration(); i++) {
-                Text courseText = new Text(" "+courseInfo.getCourse());
-                gridPane.add(courseText, day, time + i);
+                Text courseText = new Text(" " + courseInfo.getCourse());
+                StackPane coursePane = new StackPane(courseText);
+                coursePane.setStyle("-fx-background-color: " + rdColor + ";");
+                gridPane.add(coursePane, day, time + i);
             }
         }
+    }
+
+    private String getRandomColor() {
+        String[] colors = {"lightcoral", "lightcyan", "lightgoldenrodyellow",
+            "lightgray", "lightgreen", "lightpink", "lightsalmon",
+            "lightseagreen", "lightskyblue", "lightsteelblue", "lightyellow",
+            "aliceblue", "lavender", "mintcream", "honeydew", "ivory"
+        };
+    return colors[(int) (Math.random() * colors.length)];
     }
 }
