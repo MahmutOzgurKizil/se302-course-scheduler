@@ -77,18 +77,24 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        courseName.setCellValueFactory(new PropertyValueFactory<>("course"));
-        courseStartTime.setCellValueFactory(new PropertyValueFactory<>("time_to_start"));
-        courseDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
-        courseLecturer.setCellValueFactory(new PropertyValueFactory<>("lecturer"));
+        try {
+            courseName.setCellValueFactory(new PropertyValueFactory<>("course"));
+            courseStartTime.setCellValueFactory(new PropertyValueFactory<>("time_to_start"));
+            courseDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
+            courseLecturer.setCellValueFactory(new PropertyValueFactory<>("lecturer"));
 
-        ObservableList<Course> courses = FXCollections.observableArrayList(Database.getAllCourses());
-        courseTableView.setItems(courses);
+            ObservableList<Course> courses = FXCollections.observableArrayList(Database.getAllCourses());
+            courseTableView.setItems(courses);
 
-        ObservableList<Classroom> classrooms = FXCollections.observableArrayList(Database.getAllClassrooms());
-        classroomNameColumn.setCellValueFactory(new PropertyValueFactory<>("classroom"));
-        classroomCapacityColumn.setCellValueFactory(new PropertyValueFactory<>("capacity"));
-        classroomTableView.setItems(classrooms);
+            ObservableList<Classroom> classrooms = FXCollections.observableArrayList(Database.getAllClassrooms());
+            classroomNameColumn.setCellValueFactory(new PropertyValueFactory<>("classroom"));
+            classroomCapacityColumn.setCellValueFactory(new PropertyValueFactory<>("capacity"));
+            classroomTableView.setItems(classrooms);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -146,11 +152,35 @@ public class MainController {
             Stage studentListStage = new Stage();
             studentListStage.setTitle("Student List");
             studentListStage.setScene(new Scene(loader.load()));
+
+            studentListStage.showingProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    // Call the method to initialize the table
+                    MainController controller = loader.getController();
+                    controller.initializeStudentList();
+                }
+            });
+
             studentListStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    @FXML
+    public void handleStudentSchedule() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SchedulePanel.fxml"));
+            Stage studentScheduleStage = new Stage();
+            studentScheduleStage.setTitle("Student Schedule");
+            studentScheduleStage.setScene(new Scene(loader.load()));
+            SchedulePanelController controller = loader.getController();
+            controller.initializeForStudent(studentTableView.getSelectionModel().getSelectedItem().getName());
+            studentScheduleStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void initializeLecturerList() {
         String[] lecturerNames = Database.getAllLecturers();
         ObservableList<String> observableLecturerList = FXCollections.observableArrayList(lecturerNames);
@@ -180,6 +210,14 @@ public class MainController {
             Stage stage = new Stage();
             stage.setTitle("Lecturer List");
             stage.setScene(new Scene(loader.load()));
+
+            stage.showingProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    // Call the method to initialize the table
+                    MainController controller = loader.getController();
+                    controller.initializeLecturerList();
+                }
+            });
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

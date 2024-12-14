@@ -10,7 +10,7 @@
    <children>
       <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <TableView fx:id="studentTableView" onSort="#StudentFillTableView" HBox.hgrow="ALWAYS">
+            <TableView fx:id="studentTableView" onMouseClicked="#handleStudentSchedule" HBox.hgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="studentNameColumn" editable="false" prefWidth="599.999999988079" text="Student List" />
               </columns>

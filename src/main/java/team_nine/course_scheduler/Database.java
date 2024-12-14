@@ -294,4 +294,43 @@ public class Database {
             return new String[0];
         }
     }
+
+    public static Course[] getCoursesForStudent(String student) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT course
+            FROM Enrollments
+            WHERE TRIM(student_name) = ?;
+        """)) {
+            stmt.setString(1, student);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                String courseName = rs.getString("course");
+                courses.add(new Course(courseName, "", "", 0));
+            }
+            return courses.toArray(new Course[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Course[0];
+        }
+    }
+
+    public static Course getCourse(String course) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT *
+            FROM Courses
+            WHERE TRIM(course) = ?;
+        """)) {
+            stmt.setString(1, course);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Course(rs.getString("course"), rs.getString("time_to_start"), rs.getString("lecturer"), rs.getInt("duration"));
+            }
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

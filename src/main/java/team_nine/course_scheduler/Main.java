@@ -12,8 +12,6 @@ import java.io.IOException;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Database.populateCourses(new File("/Users/ozgurkizil/Desktop/Courses.csv"));
-        Database.populateClassrooms(new File("/Users/ozgurkizil/Desktop/ClassroomCapacity.csv"));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
         Parent root = loader.load();
         MainController controller = loader.getController();

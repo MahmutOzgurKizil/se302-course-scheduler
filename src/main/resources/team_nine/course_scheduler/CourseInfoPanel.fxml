@@ -22,7 +22,7 @@
                   <Font size="21.0" />
                </font>
             </TextArea>
-            <ListView fx:id="studentListView" prefHeight="200.0" prefWidth="200.0" />
+            <ListView fx:id="studentListView" onMouseClicked="#handleStudentSchedule" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
