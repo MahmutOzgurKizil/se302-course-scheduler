@@ -90,4 +90,20 @@ public class SchedulePanelController {
             }
         }
     }
+
+    public void initializeForLecturer(String lecturer) {
+        initialize("%s Schedule".formatted(lecturer));
+        Course[] courses = Database.getCoursesForLecturer(lecturer);
+        for (Course course : courses) {
+            Course courseInfo = Database.getCourse(course.getCourse());
+            String date_time = courseInfo.getTime_to_start();
+            String[] date_time_split = date_time.split(" ");
+            int day = Day.valueOf(date_time_split[0].toUpperCase()).getValue();
+            int time = Hour.fromTime(date_time_split[1]).getOrder();
+            for (int i = 0; i < courseInfo.getDuration(); i++) {
+                Text courseText = new Text(" "+courseInfo.getCourse());
+                gridPane.add(courseText, day, time + i);
+            }
+        }
+    }
 }

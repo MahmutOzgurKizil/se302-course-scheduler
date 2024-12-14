@@ -204,6 +204,23 @@ public class MainController {
     public void lecturerFillTableView() {
         initializeLecturerList();
     }
+
+    @FXML
+    public void handleLecturerSchedule() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SchedulePanel.fxml"));
+            Stage lecturerScheduleStage = new Stage();
+            lecturerScheduleStage.setTitle("Lecturer Schedule");
+            lecturerScheduleStage.setScene(new Scene(loader.load()));
+            SchedulePanelController controller = loader.getController();
+            controller.initializeForLecturer(lecturerTableView.getSelectionModel().getSelectedItem());
+            lecturerScheduleStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     public void onLecturersListButtonClick(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/team_nine/course_scheduler/LecturersList.fxml"));

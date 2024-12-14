@@ -333,4 +333,24 @@ public class Database {
         }
     }
 
+    public static Course[] getCoursesForLecturer(String lecturer) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT course
+            FROM Courses
+            WHERE TRIM(lecturer) = ?;
+        """)) {
+            stmt.setString(1, lecturer);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                String courseName = rs.getString("course");
+                courses.add(new Course(courseName, "", "", 0));
+            }
+            return courses.toArray(new Course[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Course[0];
+        }
+    }
+
 }
