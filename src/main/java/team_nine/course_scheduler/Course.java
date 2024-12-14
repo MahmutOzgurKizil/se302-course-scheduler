@@ -8,6 +8,7 @@ public class Course {
     private String lecturer;
     private int duration;
 
+
     //Course Constructor
     public Course(String time_to_start, String course, String lecturer, int duration) {
         this.course = course;
@@ -39,7 +40,21 @@ public class Course {
     }
 
     public void manualAssign(Course course, Classroom classroom){
+        String theClassroom = Database.getAllocatedClassroom(classroom.getClassroom());
+        String theCourse = course.getCourse();
 
+    try {
+        //if available match if else dont do anything
+        if(Database.getAvailability(classroom,course.getTime_to_start())){
+            Database.matchClassroom(theCourse,theClassroom);
+        }else{
+            System.out.println("classroom occup'ed");
+
+        }
+    }catch(Exception e){
+        System.out.println("Error when assigning classroom");
+        e.printStackTrace();
+    }
     }
 
     public void createCourse(String time_to_start,String course, String lecturer, int duration){
@@ -48,16 +63,23 @@ public class Course {
     }
 
 
-    public void switchClassrooms(Course OtherCourse, Classroom DesiredClassroom){
-        String current = Database.getAllocatedClassroom(this.course);
-        String theClassroom = Database.getAllocatedClassroom(OtherCourse.getCourse());
+    public void switchClassrooms(Course OtherCourse, Classroom DesiredClassroom) {
+        try{
+            String current = Database.getAllocatedClassroom(this.course);
+            String theClassroom = Database.getAllocatedClassroom(OtherCourse.getCourse());
 
-        if (theClassroom != null && Database.getAvailability(DesiredClassroom, OtherCourse.getTime_to_start()) ) {
-            System.out.println("Desired classroom is in use.");
-            return;
+            //if classroom is not available return nothing if available change clasroom
+            if (theClassroom != null && !Database.getAvailability(DesiredClassroom, OtherCourse.getTime_to_start())) {
+                System.out.println("Desired classroom is in use.");
+                return;
+            }
+            Database.changeClassroom(this.course, DesiredClassroom.getClassroom());
+        }catch (Exception e){
+            System.out.println("Error while switching classrooms."+ e.getMessage());
+            e.printStackTrace();
         }
-        Database.changeClassroom(this.course, DesiredClassroom.getClassroom());
     }
+
 
     public void addStudents(ArrayList<Student> students){
         String[] EnrolledStudents = new  String[students.size()];
