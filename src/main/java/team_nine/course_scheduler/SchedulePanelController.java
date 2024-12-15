@@ -27,6 +27,7 @@ public class SchedulePanelController {
             return value;
         }
     }
+
     private enum Hour {
         EIGHT_THIRTY(1, "08:30"), NINE_TWENTY_FIVE(2, "09:25"), TEN_TWENTY(3, "10:20"), ELEVEN_FIFTEEN(4, "11:15"),
         TWELVE_TEN(5, "12:10"), ONE_FIVE(6, "13:05"), TWO(7, "14:00"), TWO_FIFTY_FIVE(8, "14:55"), THREE_FIFTY(9, "15:50"),
@@ -47,6 +48,7 @@ public class SchedulePanelController {
         public String getTime() {
             return time;
         }
+
         public static Hour fromTime(String time) {
             String normalizedTime = time.length() == 4 ? "0" + time : time;
             for (Hour hour : Hour.values()) {
@@ -61,45 +63,38 @@ public class SchedulePanelController {
     private void initialize(String title) {
         scheduleTitleText.setText(title);
         for (Day day : Day.values()) {
-            Text dayText = new Text(day.toString());
-            gridPane.add(dayText, day.getValue(), 0);
+            gridPane.add(new Text(day.toString()), day.getValue(), 0);
         }
         for (Hour hour : Hour.values()) {
-            Text hourText = new Text(hour.getTime());
-            gridPane.add(hourText, 0, hour.getOrder());
+            gridPane.add(new Text(hour.getTime()), 0, hour.getOrder());
         }
         for (Node node : gridPane.getChildren()) {
             if (node instanceof Text) {
                 GridPane.setMargin(node, new Insets(5));
-                GridPane.setMargin(node, new Insets(5));
-                GridPane.setHalignment(node, HPos.CENTER);            }
+                GridPane.setHalignment(node, HPos.CENTER);
+            }
         }
     }
 
     public void initializeForStudent(String student) {
         initialize("%s Schedule".formatted(student));
-        Course[] courses = Database.getCoursesForStudent(student);
-        createWeeklySchedule(courses);
+        createWeeklySchedule(Database.getCoursesForStudent(student));
     }
-
 
     public void initializeForLecturer(String lecturer) {
         initialize("%s Schedule".formatted(lecturer));
-        Course[] courses = Database.getCoursesForLecturer(lecturer);
-        createWeeklySchedule(courses);
+        createWeeklySchedule(Database.getCoursesForLecturer(lecturer));
     }
 
     private void createWeeklySchedule(Course[] courses) {
         for (Course course : courses) {
             Course courseInfo = Database.getCourse(course.getCourse());
-            String date_time = courseInfo.getTime_to_start();
-            String[] date_time_split = date_time.split(" ");
-            int day = Day.valueOf(date_time_split[0].toUpperCase()).getValue();
-            int time = Hour.fromTime(date_time_split[1]).getOrder();
+            String[] dateTimeSplit = courseInfo.getTime_to_start().split(" ");
+            int day = Day.valueOf(dateTimeSplit[0].toUpperCase()).getValue();
+            int time = Hour.fromTime(dateTimeSplit[1]).getOrder();
             String rdColor = getRandomColor();
             for (int i = 0; i < courseInfo.getDuration(); i++) {
-                Text courseText = new Text(" " + courseInfo.getCourse());
-                StackPane coursePane = new StackPane(courseText);
+                StackPane coursePane = new StackPane(new Text(" " + courseInfo.getCourse()));
                 coursePane.setStyle("-fx-background-color: " + rdColor + ";");
                 gridPane.add(coursePane, day, time + i);
             }
@@ -107,11 +102,9 @@ public class SchedulePanelController {
     }
 
     private String getRandomColor() {
-        String[] colors = {"lightcoral", "lightcyan", "lightgoldenrodyellow",
-            "lightgray", "lightgreen", "lightpink", "lightsalmon",
-            "lightseagreen", "lightskyblue", "lightsteelblue", "lightyellow",
-            "aliceblue", "lavender", "mintcream", "honeydew", "ivory"
-        };
-    return colors[(int) (Math.random() * colors.length)];
+        String[] colors = {"lightcoral", "lightcyan", "lightgoldenrodyellow", "lightgray", "lightgreen", "lightpink",
+            "lightsalmon", "lightseagreen", "lightskyblue", "lightsteelblue", "lightyellow", "aliceblue", "lavender",
+            "mintcream", "honeydew", "ivory"};
+        return colors[(int) (Math.random() * colors.length)];
     }
 }
