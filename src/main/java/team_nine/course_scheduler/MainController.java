@@ -73,8 +73,6 @@ public class MainController {
     @FXML
     private TextField courseStudentsTextField;
     @FXML
-    private TextField courseClassroomTextField;
-    @FXML
     private Spinner<Integer> courseHourSpinner;
     @FXML
     private ChoiceBox<String> dayChoiceBox;
@@ -83,6 +81,8 @@ public class MainController {
     @FXML
     private ListView<Student> addCourseStudentList;
     private ArrayList<Student> selectedStudents = new ArrayList<>();
+    @FXML
+    private ChoiceBox<Classroom> classroomChoiceBox;
 
     @FXML
     public void initialize() {
@@ -288,6 +288,7 @@ public class MainController {
                     controller.timeChoiceBox.setItems(FXCollections.observableArrayList(times));
                     controller.addCourseStudentList.setCellFactory(param -> new CheckBoxListCell<>(controller::createCheckBox));
                     controller.addCourseStudentList.setItems(FXCollections.observableArrayList(Database.getAllStudents()));
+                    controller.classroomChoiceBox.setItems(FXCollections.observableArrayList(Database.getAllClassrooms()));
 
                 }
             });
@@ -328,7 +329,7 @@ public class MainController {
         String day = dayChoiceBox.getValue();
         String time = timeChoiceBox.getValue();
         String lecturer = courseLecturerTextField.getText();
-        String classroom = courseClassroomTextField.getText();
+        String classroom = classroomChoiceBox.getValue().getClassroom();
         int hour = courseHourSpinner.getValue();
 
         if (courseName.isEmpty()||day.isEmpty()||time.isEmpty()||lecturer.isEmpty()||students.length == 0||classroom.isEmpty()) {

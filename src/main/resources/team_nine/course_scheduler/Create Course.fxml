@@ -44,10 +44,10 @@
                   <ListView fx:id="addCourseStudentList" prefHeight="300.0" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Classroom" wrappingWidth="60.0" />
-                  <TextField fx:id="courseClassroomTextField" minHeight="-Infinity" prefHeight="30.0" promptText="Select classroom..." HBox.hgrow="ALWAYS" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Classroom" wrappingWidth="60.0" HBox.hgrow="ALWAYS" />
+                  <ChoiceBox fx:id="classroomChoiceBox" prefWidth="247.0" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="10.0">
