@@ -271,7 +271,7 @@ public class Database {
             return null;
         }
     }
-
+    /*
     public static boolean getAvailability(Classroom classroom, String DesiredTime) {
         try (PreparedStatement stmt = conn.prepareStatement("""
                 SELECT time_to_start, duration FROM Courses WHERE classroom_name = ? AND ? BETWEEN time_to_start AND DATE_ADD(time_to_start, INTERVAL duration MINUTE) 
@@ -287,6 +287,7 @@ public class Database {
         }
         return true;
     }
+     */
 
     public static int getCapacity(Classroom classroom){
         try (PreparedStatement stmt = conn.prepareStatement("""

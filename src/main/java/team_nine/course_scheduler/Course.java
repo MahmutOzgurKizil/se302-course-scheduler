@@ -1,6 +1,7 @@
 package team_nine.course_scheduler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Course {
     private String time_to_start;
@@ -74,5 +75,23 @@ public class Course {
         Database.removeStudent(course,withdrawal);
     }
 
-    public boolean
+
+
+    public static String iterateDate(Course course, int duration){
+        String date = Database.getTimeOfCourse(course);
+        String[] SplitDate = date.split(" ");
+        String[] PossibleTimes ={"08:30","09:25","10:20","11:15",
+                                "12:10","13:05", "14:00","14:55",
+                                "15:50","16:45","17:40","18:35"
+                                ,"19:30","20:25","21:20","22:15"};
+        int i = 0;
+        for (String s : PossibleTimes){
+            if(SplitDate[1]==s){
+                String temp = s;
+                break;
+            }
+            i++;
+        }
+        return PossibleTimes[i+duration];
+    }
 }
