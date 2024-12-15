@@ -73,4 +73,6 @@ public class Course {
         String withdrawal = student.getName();
         Database.removeStudent(course,withdrawal);
     }
+
+    public boolean
 }

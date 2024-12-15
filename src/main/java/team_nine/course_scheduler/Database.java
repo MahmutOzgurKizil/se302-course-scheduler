@@ -311,4 +311,28 @@ public class Database {
             throw new RuntimeException(e);
         }
     }
+
+    public static String getTimeOfCourse(Course course){
+        try (PreparedStatement stmt = conn.prepareStatement("""
+        SELECT time_to_start FROM Courses WHERE course_name = ?
+        """)){
+            stmt.setString(1,course.getCourse());
+            ResultSet rs = stmt.executeQuery();
+            return rs.getString(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getDuration(Course course){
+        try (PreparedStatement stmt = conn.prepareStatement("""
+        SELECT duration FROM Courses WHERE course_name = ?
+        """)){
+            stmt.setString(1,course.getCourse());
+            ResultSet rs = stmt.executeQuery();
+            return rs.getString(2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
