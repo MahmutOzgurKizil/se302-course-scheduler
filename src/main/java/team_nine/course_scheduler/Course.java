@@ -46,7 +46,7 @@ public class Course {
 
     try {
         //if available match if else dont do anything
-        if(Database.getAvailability(classroom,course.getTime_to_start())){
+        if(isAvailable(classroom,course)){
             Database.matchClassroom(theCourse,theClassroom);
         }else{
             System.out.println("classroom occup'ed");
@@ -70,7 +70,7 @@ public class Course {
             String theClassroom = Database.getAllocatedClassroom(OtherCourse.getCourse());
 
             //if classroom is not available return nothing if available change clasroom
-            if (theClassroom != null && !Database.getAvailability(DesiredClassroom, OtherCourse.getTime_to_start())) {
+            if (theClassroom != null && isAvailable(DesiredClassroom, OtherCourse)){
                 System.out.println("Desired classroom is in use.");
                 return;
             }
