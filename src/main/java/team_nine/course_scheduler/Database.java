@@ -336,4 +336,16 @@ public class Database {
             throw new RuntimeException(e);
         }
     }
+    public static String getAllocatedCourse(String classroom) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+                SELECT course FROM Allocated WHERE classroom = ?;
+            """)) {
+            stmt.setString(1, classroom);
+            ResultSet rs = stmt.executeQuery();
+            return rs.getString("course");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

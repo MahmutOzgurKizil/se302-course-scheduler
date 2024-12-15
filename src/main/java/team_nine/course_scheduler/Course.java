@@ -29,10 +29,10 @@ public class Course {
 
     public void autoAssign(Course course){
         Classroom[] PotentialClasses = Database.getAllClassrooms();
-        for(Classroom c : PotentialClasses){
-            if(Database.getAvailability(c,course.time_to_start)&&Database.getCapacity(c)<=Database.getStudentNumber(course)){
-                Database.changeClassroom(course.course,c.getClassroom());
-                System.out.println("Course succesfully added to classroom: " + c.getClassroom() + " at time: "+course.time_to_start);
+        for(Classroom classroom : PotentialClasses){
+            if(isAvailable(classroom,course)&&Database.getCapacity(classroom)<=Database.getStudentNumber(course)){
+                Database.changeClassroom(course.course,classroom.getClassroom());
+                System.out.println("Course succesfully added to classroom: " + classroom.getClassroom() + " at time: "+course.time_to_start);
                 return;
             }
             System.out.println("All Classrooms are occupied");
@@ -75,10 +75,9 @@ public class Course {
         Database.removeStudent(course,withdrawal);
     }
 
-
-
-    public static String iterateDate(Course course, int duration){
+    public static Course iterateDate(Course course){
         String date = Database.getTimeOfCourse(course);
+        int duration = Integer.parseInt(Database.getDuration(course));
         String[] SplitDate = date.split(" ");
         String[] PossibleTimes ={"08:30","09:25","10:20","11:15",
                                 "12:10","13:05", "14:00","14:55",
@@ -92,6 +91,15 @@ public class Course {
             }
             i++;
         }
-        return PossibleTimes[i+duration];
+        Course temp = new Course(PossibleTimes[i+duration], "","" , 0);
+        return temp;
+    }
+    public static boolean isAvailable(Classroom classroom,Course course){
+        String allocatedCourse = Database.getAllocatedCourse(classroom.getClassroom());
+        if(allocatedCourse==null&&iterateDate(course).time_to_start==null){
+            Database.matchClassroom(course.course,classroom.getClassroom());
+            return true;
+        }
+        return false;
     }
 }
