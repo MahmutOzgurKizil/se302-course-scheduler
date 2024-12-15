@@ -1,6 +1,8 @@
 package team_nine.course_scheduler;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -8,12 +10,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainController {
     @FXML
@@ -65,15 +69,20 @@ public class MainController {
     @FXML
     private TextField courseNameTextField;
     @FXML
-    private TextField courseDateTimeTextField;
-    @FXML
     private TextField courseLecturerTextField;
     @FXML
     private TextField courseStudentsTextField;
     @FXML
     private TextField courseClassroomTextField;
     @FXML
-    private TextField courseHourTextField;
+    private Spinner<Integer> courseHourSpinner;
+    @FXML
+    private ChoiceBox<String> dayChoiceBox;
+    @FXML
+    private ChoiceBox<String> timeChoiceBox;
+    @FXML
+    private ListView<Student> addCourseStudentList;
+    private ArrayList<Student> selectedStudents = new ArrayList<>();
 
     @FXML
     public void initialize() {
@@ -268,6 +277,20 @@ public class MainController {
             Stage addCourseStage = new Stage();
             addCourseStage.setTitle("Add New Course");
             addCourseStage.setScene(new Scene(loader.load()));
+            addCourseStage.showingProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    // Call the method to initialize the table
+                    MainController controller = loader.getController();
+                    controller.courseHourSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 8,1));
+                    String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+                    String[] times = {"8:30", "9:25", "10:20", "11:15", "12:10", "13:05", "14:00", "14:55", "15:50", "16:45", "17:40", "18:35", "19:30"};
+                    controller.dayChoiceBox.setItems(FXCollections.observableArrayList(days));
+                    controller.timeChoiceBox.setItems(FXCollections.observableArrayList(times));
+                    controller.addCourseStudentList.setCellFactory(param -> new CheckBoxListCell<>(controller::createCheckBox));
+                    controller.addCourseStudentList.setItems(FXCollections.observableArrayList(Database.getAllStudents()));
+
+                }
+            });
             addCourseStage.show();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -278,19 +301,41 @@ public class MainController {
         }
     }
 
+
+    private ObservableValue<Boolean> createCheckBox(Student student) {
+        SimpleBooleanProperty selected = new SimpleBooleanProperty();
+        selected.addListener((obs, wasSelected, isNowSelected) -> handleCheckBoxSelection(student, isNowSelected));
+        CheckBox checkBox = new CheckBox(student.getName());
+        checkBox.selectedProperty().bindBidirectional(selected);
+        return selected;
+    }
+
+    private void handleCheckBoxSelection(Student student, boolean isSelected) {
+        if (isSelected) {
+            selectedStudents.add(student); // Add student to selected list
+            System.out.println(selectedStudents);
+        } else {
+            selectedStudents.remove(student); // Remove student from selected list
+            System.out.println(selectedStudents);
+        }
+    }
+
     @FXML
     public void onAddCourseClick() {
-        String courseName = courseNameTextField.getText();
-        String dateTime = courseDateTimeTextField.getText();
-        String lecturer = courseLecturerTextField.getText();
-        String students = courseStudentsTextField.getText();
-        String classroom = courseClassroomTextField.getText();
-        String hour = courseHourTextField.getText();
+        Student[] students = selectedStudents.toArray(new Student[0]);
 
-        if (courseName.isEmpty()||dateTime.isEmpty()||lecturer.isEmpty()||students.isEmpty()||classroom.isEmpty()||hour.isEmpty()) {
+        String courseName = courseNameTextField.getText();
+        String day = dayChoiceBox.getValue();
+        String time = timeChoiceBox.getValue();
+        String lecturer = courseLecturerTextField.getText();
+        String classroom = courseClassroomTextField.getText();
+        int hour = courseHourSpinner.getValue();
+
+        if (courseName.isEmpty()||day.isEmpty()||time.isEmpty()||lecturer.isEmpty()||students.length == 0||classroom.isEmpty()) {
             showErrorMessage("All fields must be filled in.");
+
         } else {
-            Course newCourse = new Course(courseName, dateTime, lecturer, students, classroom, hour);
+            //Course newCourse = new Course(courseName, dateTime, lecturer, students, classroom, hour);
             showSuccessMessage("Course added successfully!");
             // save it in a database
             // addCourseToList(newCourse);
@@ -312,8 +357,4 @@ public class MainController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-
-
-
 }

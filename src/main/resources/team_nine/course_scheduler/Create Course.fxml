@@ -2,116 +2,72 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="team_nine.course_scheduler.MainController">
+<AnchorPane prefHeight="300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="team_nine.course_scheduler.MainController">
    <children>
-      <HBox prefHeight="350.0" prefWidth="600.0">
+      <VBox alignment="CENTER" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <VBox prefHeight="300.0" prefWidth="134.0">
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <TextArea editable="false" minHeight="-Infinity" prefHeight="30.0" prefWidth="149.0" text="Name">
-                     <VBox.margin>
-                        <Insets bottom="20.0" top="10.0" />
-                     </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" right="5.0" />
-                     </padding>
-                  </TextArea>
-                  <TextArea editable="false" minHeight="-Infinity" prefHeight="30.0" text="Date/Time">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" right="5.0" />
-                     </padding>
-                  </TextArea>
-                  <TextArea editable="false" minHeight="-Infinity" prefHeight="30.0" text="Lecturer">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" right="5.0" />
-                     </padding>
-                  </TextArea>
-                  <TextArea editable="false" minHeight="-Infinity" prefHeight="30.0" text="Students">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" right="5.0" />
-                     </padding>
-                  </TextArea>
-                  <TextArea editable="false" minHeight="-Infinity" prefHeight="30.0" text="Classroom">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" right="5.0" />
-                     </padding>
-                  </TextArea>
-                  <TextArea editable="false" minHeight="-Infinity" prefHeight="30.0" text="During Hour">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" right="5.0" />
-                     </padding>
-                  </TextArea>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name" wrappingWidth="60.0" />
+                  <TextField fx:id="courseNameTextField" minHeight="-Infinity" prefHeight="30.0" promptText="Enter a course name..." HBox.hgrow="ALWAYS" />
                </children>
-               <HBox.margin>
-                  <Insets bottom="20.0" left="60.0" top="30.0" />
-               </HBox.margin>
-            </VBox>
-            <VBox prefHeight="200.0" prefWidth="300.0">
-               <HBox.margin>
-                  <Insets left="30.0" top="25.0" />
-               </HBox.margin>
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
                <children>
-                  <TextField fx:id="courseNameTextField" minHeight="-Infinity" prefHeight="30.0" text="Enter a course name...">
-                     <VBox.margin>
-                        <Insets bottom="20.0" top="15.0" />
-                     </VBox.margin>
-                  </TextField>
-                  <TextField fx:id="courseDateTimeTextField" minHeight="-Infinity" prefHeight="30.0" text="Select date/time...">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                  </TextField>
-                  <TextField fx:id="courseLecturerTextField" minHeight="-Infinity" prefHeight="30.0" text="Select lecturer...">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                  </TextField>
-                  <TextField fx:id="courseStudentsTextField" minHeight="-Infinity" prefHeight="30.0" text="Select students...">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                  </TextField>
-                  <TextField fx:id="courseClassroomTextField" minHeight="-Infinity" prefHeight="30.0" text="Select classroom...">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                  </TextField>
-                  <TextField fx:id="courseHourTextField" minHeight="-Infinity" prefHeight="30.0" text="Select during hour..." />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Date/Time" wrappingWidth="60.0" />
+                  <HBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <ChoiceBox fx:id="dayChoiceBox" prefWidth="180.0" HBox.hgrow="ALWAYS" />
+                        <ChoiceBox fx:id="timeChoiceBox" prefWidth="62.0" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
                </children>
-            </VBox>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lecturer" wrappingWidth="60.0" />
+                  <TextField fx:id="courseLecturerTextField" minHeight="-Infinity" prefHeight="30.0" promptText="Select lecturer..." HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER" prefHeight="300.0" spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Students" wrappingWidth="60.0" />
+                  <ListView fx:id="addCourseStudentList" prefHeight="300.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Classroom" wrappingWidth="60.0" />
+                  <TextField fx:id="courseClassroomTextField" minHeight="-Infinity" prefHeight="30.0" promptText="Select classroom..." HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Duration" wrappingWidth="60.0" />
+                  <Spinner fx:id="courseHourSpinner" prefWidth="247.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="addCourseButton" alignment="CENTER" mnemonicParsing="false" onAction="#onAddCourseClick" text="Add Course" />
+               </children>
+               <VBox.margin>
+                  <Insets right="10.0" />
+               </VBox.margin>
+            </HBox>
          </children>
-      </HBox>
-      <HBox layoutY="349.0" prefHeight="50.0" prefWidth="600.0">
-         <children>
-            <Button fx:id="addCourseButton" mnemonicParsing="false" onAction="#onAddCourseClick" text="Add Course">
-               <HBox.margin>
-                  <Insets left="500.0" top="5.0" />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
    </children>
 </AnchorPane>
