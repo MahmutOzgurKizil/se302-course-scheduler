@@ -271,7 +271,7 @@ public class Database {
             return null;
         }
     }
-
+    /*
     public static boolean getAvailability(Classroom classroom, String DesiredTime) {
         try (PreparedStatement stmt = conn.prepareStatement("""
                 SELECT time_to_start, duration FROM Courses WHERE classroom_name = ? AND ? BETWEEN time_to_start AND DATE_ADD(time_to_start, INTERVAL duration MINUTE) 
@@ -287,6 +287,7 @@ public class Database {
         }
         return true;
     }
+     */
 
     public static int getCapacity(Classroom classroom){
         try (PreparedStatement stmt = conn.prepareStatement("""
@@ -297,6 +298,54 @@ public class Database {
             return rs.getInt(1);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static int getStudentNumber(Course course){
+        try (PreparedStatement stmt = conn.prepareStatement("""
+        SELECT COUNT(*) FROM Enrollments WHERE course_name = ?
+        """)){
+            stmt.setString(1,course.getCourse());
+            ResultSet rs = stmt.executeQuery();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getTimeOfCourse(Course course){
+        try (PreparedStatement stmt = conn.prepareStatement("""
+        SELECT time_to_start FROM Courses WHERE course_name = ?
+        """)){
+            stmt.setString(1,course.getCourse());
+            ResultSet rs = stmt.executeQuery();
+            return rs.getString(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getDuration(Course course){
+        try (PreparedStatement stmt = conn.prepareStatement("""
+        SELECT duration FROM Courses WHERE course_name = ?
+        """)){
+            stmt.setString(1,course.getCourse());
+            ResultSet rs = stmt.executeQuery();
+            return rs.getString(2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static String getAllocatedCourse(String classroom) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+                SELECT course FROM Allocated WHERE classroom = ?;
+            """)) {
+            stmt.setString(1, classroom);
+            ResultSet rs = stmt.executeQuery();
+            return rs.getString("course");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

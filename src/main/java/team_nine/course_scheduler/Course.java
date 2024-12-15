@@ -1,6 +1,7 @@
 package team_nine.course_scheduler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Course {
     private String time_to_start;
@@ -29,10 +30,10 @@ public class Course {
 
     public void autoAssign(Course course){
         Classroom[] PotentialClasses = Database.getAllClassrooms();
-        for(Classroom c : PotentialClasses){
-            if(Database.getAvailability(c,course.time_to_start)){
-                Database.changeClassroom(course.course,c.getClassroom());
-                System.out.println("Course succesfully added to classroom: " + c.getClassroom() + " at time: "+course.time_to_start);
+        for(Classroom classroom : PotentialClasses){
+            if(isAvailable(classroom,course)&&Database.getCapacity(classroom)<=Database.getStudentNumber(course)){
+                Database.changeClassroom(course.course,classroom.getClassroom());
+                System.out.println("Course succesfully added to classroom: " + classroom.getClassroom() + " at time: "+course.time_to_start);
                 return;
             }
             System.out.println("All Classrooms are occupied");
@@ -94,5 +95,33 @@ public class Course {
     public void removeStudents(Student student){
         String withdrawal = student.getName();
         Database.removeStudent(course,withdrawal);
+    }
+
+    public static Course iterateDate(Course course){
+        String date = Database.getTimeOfCourse(course);
+        int duration = Integer.parseInt(Database.getDuration(course));
+        String[] SplitDate = date.split(" ");
+        String[] PossibleTimes ={"08:30","09:25","10:20","11:15",
+                                "12:10","13:05", "14:00","14:55",
+                                "15:50","16:45","17:40","18:35"
+                                ,"19:30","20:25","21:20","22:15"};
+        int i = 0;
+        for (String s : PossibleTimes){
+            if(SplitDate[1]==s){
+                String temp = s;
+                break;
+            }
+            i++;
+        }
+        Course temp = new Course(PossibleTimes[i+duration], "","" , 0);
+        return temp;
+    }
+    public static boolean isAvailable(Classroom classroom,Course course){
+        String allocatedCourse = Database.getAllocatedCourse(classroom.getClassroom());
+        if(allocatedCourse==null&&iterateDate(course).time_to_start==null){
+            Database.matchClassroom(course.course,classroom.getClassroom());
+            return true;
+        }
+        return false;
     }
 }
