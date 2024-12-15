@@ -299,4 +299,16 @@ public class Database {
             throw new RuntimeException(e);
         }
     }
+
+    public static int getStudentNumber(Course course){
+        try (PreparedStatement stmt = conn.prepareStatement("""
+        SELECT COUNT(*) FROM Enrollments WHERE course_name = ?
+        """)){
+            stmt.setString(1,course.getCourse());
+            ResultSet rs = stmt.executeQuery();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

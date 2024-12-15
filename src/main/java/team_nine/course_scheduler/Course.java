@@ -29,7 +29,7 @@ public class Course {
     public void autoAssign(Course course){
         Classroom[] PotentialClasses = Database.getAllClassrooms();
         for(Classroom c : PotentialClasses){
-            if(Database.getAvailability(c,course.time_to_start)){
+            if(Database.getAvailability(c,course.time_to_start)&&Database.getCapacity(c)<=Database.getStudentNumber(course)){
                 Database.changeClassroom(course.course,c.getClassroom());
                 System.out.println("Course succesfully added to classroom: " + c.getClassroom() + " at time: "+course.time_to_start);
                 return;
