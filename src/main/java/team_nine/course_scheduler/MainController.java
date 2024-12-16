@@ -104,9 +104,9 @@ public class MainController {
     private ObservableList<Student> allStudents;
     private ObservableList<Student> filteredStudents;
     @FXML
-    private ChoiceBox<String> selectclassroomSwitchChoiceBox;
+    private ChoiceBox<Classroom> selectclassroomSwitchChoiceBox;
     @FXML
-    private ChoiceBox<String> selectcourseSwitchChoiceBox;
+    private ChoiceBox<Course> selectcourseSwitchChoiceBox;
     @FXML
     private Button allocateButton;
     @FXML
@@ -429,7 +429,8 @@ public class MainController {
 
 
     private void updateStudentListForCourse(Course course) {
-        String[] studentNames = course.getStudents().split(",\\s*");
+        //String[] studentNames = course.getStudents().split(",\\s*");
+        String[] studentNames = Database.getStudentsInCourse(course.getCourse());
         allStudents = FXCollections.observableArrayList(Database.getAllStudents());
 
         for (String name : studentNames) {
@@ -503,21 +504,13 @@ public class MainController {
         }
     }
 
-    public void initializeAllocateClass() {
-        selectcourseSwitchChoiceBox.setItems(courseList);
-        selectclassroomSwitchChoiceBox.setItems(classroomList);
 
-        selectcourseSwitchChoiceBox.getSelectionModel().selectFirst();
-        selectclassroomSwitchChoiceBox.getSelectionModel().selectFirst();
-
-        allocateButton.setOnAction(event -> allocateCourseAndClassroom());
-    }
 
     private void allocateCourseAndClassroom() {
-        String selectedCourse = selectcourseSwitchChoiceBox.getValue();
-        String selectedClassroom = selectclassroomSwitchChoiceBox.getValue();
+        Course selectedCourse = selectcourseSwitchChoiceBox.getValue();
+        Classroom selectedClassroom = selectclassroomSwitchChoiceBox.getValue();
 
-        if (selectedCourse != null && selectedClassroom != null) {
+        if (!selectedCourse.getCourse().isEmpty() && !selectedClassroom.getClassroom().isEmpty()) {
             System.out.println("Allocated " + selectedCourse + " to " + selectedClassroom);
         } else {
             System.out.println("Please select both a course and a classroom.");
@@ -533,15 +526,21 @@ public class MainController {
     private void openAllocationWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/team_nine/course_scheduler/AllocateClassroom.fxml"));
-            AnchorPane allocationWindow = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(loader.load()));
 
-            Stage allocationStage = new Stage();
-            //allocationStage.setTitle("Allocate Course and Classroom");
 
-            Scene allocationScene = new Scene(allocationWindow);
-            allocationStage.setScene(allocationScene);
+            stage.showingProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    MainController controller = loader.getController();
+                    controller.selectclassroomSwitchChoiceBox.setItems(FXCollections.observableArrayList(Database.getAllClassrooms()));
+                    controller.selectcourseSwitchChoiceBox.setItems(FXCollections.observableArrayList(Database.getAllCourses()));
 
-            allocationStage.show();
+                }
+            });
+
+
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

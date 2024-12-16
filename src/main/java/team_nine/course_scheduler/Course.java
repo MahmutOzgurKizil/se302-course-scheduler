@@ -113,4 +113,9 @@ public class Course {
         String withdrawal = student.getName();
         Database.removeStudent(course,withdrawal);
     }
+
+    @Override
+    public String toString() {
+        return course;
+    }
 }
