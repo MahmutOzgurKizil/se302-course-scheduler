@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -102,6 +103,20 @@ public class MainController {
     private Course selectedCourse;
     private ObservableList<Student> allStudents;
     private ObservableList<Student> filteredStudents;
+    @FXML
+    private ChoiceBox<String> selectclassroomSwitchChoiceBox;
+    @FXML
+    private ChoiceBox<String> selectcourseSwitchChoiceBox;
+    @FXML
+    private Button allocateButton;
+    @FXML
+    private Button cancelButton;
+    private ObservableList<String> courseList = FXCollections.observableArrayList();
+    private ObservableList<String> classroomList = FXCollections.observableArrayList();
+    @FXML
+    private MenuItem optionallyAllocationWindowMenuItem;
+
+
 
 
     @FXML
@@ -386,7 +401,6 @@ public class MainController {
 
     }
 
-    // Setup the ChoiceBox for courses
     private void setupCourseChoiceBox() {
         ObservableList<Course> courses = FXCollections.observableArrayList(Database.getAllCourses());
         courseChoiceBox.setItems(courses);
@@ -403,20 +417,17 @@ public class MainController {
         }
     }
 
-    // Setup the ListView for students
     private void setupStudentListView() {
         selectedStudents = new ArrayList<>();
         searchStudentListView.setCellFactory(param -> new CheckBoxListCell<>(this::createCheckBox));
     }
 
-    // Setup the search feature
     private void setupSearchFeature() {
         searchStudentButton.setOnAction(event -> filterStudentList());
         searchStudentField.textProperty().addListener((obs, oldText, newText) -> filterStudentList()); // Filter on text change
     }
 
 
-    // Update the student list based on the selected course
     private void updateStudentListForCourse(Course course) {
         String[] studentNames = course.getStudents().split(",\\s*");
         allStudents = FXCollections.observableArrayList(Database.getAllStudents());
@@ -429,14 +440,12 @@ public class MainController {
         searchStudentListView.setItems(filteredStudents);
     }
 
-    // Helper method to create a checkbox for each student
     private ObservableValue<Boolean> createCheckBoxforStudent(Student student) {
         SimpleBooleanProperty selected = new SimpleBooleanProperty();
         selected.addListener((obs, wasSelected, isNowSelected) -> handleCheckBoxSelection(student, isNowSelected));
         return selected;
     }
 
-    // Handle checkbox selection
     private void handleCheckBoxSelectionforStudent(Student student, boolean isSelected) {
         if (isSelected) {
             selectedStudents.add(student);
@@ -445,7 +454,6 @@ public class MainController {
         }
     }
 
-    // Method to filter the student list based on the search query
     private void filterStudentList() {
         String query = searchStudentField.getText().toLowerCase();
         if (query.isEmpty()) {
@@ -483,7 +491,7 @@ public class MainController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/team_nine/course_scheduler/AddDeleteStudents.fxml"));
             Stage stage = new Stage();
-           // stage.setTitle("Manage Student");
+           //
             stage.setScene(new Scene(loader.load()));
 
             MainController controller = loader.getController();
@@ -491,9 +499,54 @@ public class MainController {
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            showErrorMessage("Unable to open the Manage Students window.");
+            showErrorMessage("Unable to open the this window.");
         }
     }
+
+    public void initializeAllocateClass() {
+        selectcourseSwitchChoiceBox.setItems(courseList);
+        selectclassroomSwitchChoiceBox.setItems(classroomList);
+
+        selectcourseSwitchChoiceBox.getSelectionModel().selectFirst();
+        selectclassroomSwitchChoiceBox.getSelectionModel().selectFirst();
+
+        allocateButton.setOnAction(event -> allocateCourseAndClassroom());
+    }
+
+    private void allocateCourseAndClassroom() {
+        String selectedCourse = selectcourseSwitchChoiceBox.getValue();
+        String selectedClassroom = selectclassroomSwitchChoiceBox.getValue();
+
+        if (selectedCourse != null && selectedClassroom != null) {
+            System.out.println("Allocated " + selectedCourse + " to " + selectedClassroom);
+        } else {
+            System.out.println("Please select both a course and a classroom.");
+        }
+    }
+
+
+    public void initializeOptionally() {
+        optionallyAllocationWindowMenuItem.setOnAction(event -> openAllocationWindow());
+    }
+
+    @FXML
+    private void openAllocationWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/team_nine/course_scheduler/AllocateClassroom.fxml"));
+            AnchorPane allocationWindow = loader.load();
+
+            Stage allocationStage = new Stage();
+            //allocationStage.setTitle("Allocate Course and Classroom");
+
+            Scene allocationScene = new Scene(allocationWindow);
+            allocationStage.setScene(allocationScene);
+
+            allocationStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

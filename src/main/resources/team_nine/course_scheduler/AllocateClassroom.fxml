@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="team_nine.course_scheduler.MainController">
+   <children>
+      <HBox layoutX="-1.0" layoutY="294.0" prefHeight="66.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Button fx:id="allocateButton" mnemonicParsing="false" text="Allocate">
+               <HBox.margin>
+                  <Insets bottom="20.0" left="415.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel">
+               <HBox.margin>
+                  <Insets bottom="20.0" left="25.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+      <ChoiceBox fx:id="selectcourseSwitchChoiceBox" layoutX="269.0" layoutY="126.0" prefHeight="26.0" prefWidth="200.0" AnchorPane.bottomAnchor="248.39999999999998" AnchorPane.leftAnchor="269.0" AnchorPane.rightAnchor="131.79999999999995" AnchorPane.topAnchor="126.0" />
+      <ChoiceBox fx:id="selectclassroomSwitchChoiceBox" layoutX="270.0" layoutY="201.0" prefHeight="25.0" prefWidth="200.0" AnchorPane.bottomAnchor="174.20000000000002" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="131.60000000000002" AnchorPane.topAnchor="201.0" />
+      <TextField layoutX="127.0" layoutY="126.0" prefHeight="26.0" prefWidth="110.0" text="Course" />
+      <TextField layoutX="127.0" layoutY="200.0" prefHeight="26.0" prefWidth="110.0" text="Classroom" />
+   </children>
+</AnchorPane>
