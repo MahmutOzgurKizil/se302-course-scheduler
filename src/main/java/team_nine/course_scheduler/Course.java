@@ -9,9 +9,8 @@ public class Course {
     private String lecturer;
     private int duration;
 
-
     //Course Constructor
-    public Course(String time_to_start, String course, String lecturer, int duration) {
+    public Course(String course, String time_to_start, String lecturer, int duration) {
         this.course = course;
         this.time_to_start = time_to_start;
         this.duration = duration;
@@ -123,5 +122,10 @@ public class Course {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return course;
     }
 }
