@@ -30,7 +30,12 @@
                             <MenuItem fx:id="optionally" mnemonicParsing="false" onAction="#openAllocationWindow" text="Optionally" />
                           </items>
                         </Menu>
-                      <MenuItem fx:id="importCsvMenuItem" mnemonicParsing="false" text="Import CSV File" />
+                        <Menu mnemonicParsing="false" text="Import CSV File">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#importCoursesFromCsv" text="Import Courses" />
+                              <MenuItem mnemonicParsing="false" onAction="#importClassroomsFromCsv" text="Import Classrooms" />
+                          </items>
+                        </Menu>
                       <MenuItem fx:id="addDeleteStudentMenuItem" mnemonicParsing="false" onAction="#onaddDeleteStudentButtonClick" text="Add/Delete Student" />
                         <MenuItem fx:id="addNewCourseMenuItem" mnemonicParsing="false" onAction="#onAddNewCourseClick" text="Add New Course" />
                     </items>

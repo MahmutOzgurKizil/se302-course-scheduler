@@ -14,8 +14,10 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -540,6 +542,32 @@ public class MainController {
         }
     }
 
+    @FXML
+    private void importCoursesFromCsv() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setTitle("Select Courses CSV File");
+        File file = fileChooser.showOpenDialog(null);
+        try {
+            Database.populateCourses(file);
+        }catch (Exception e){
+            showErrorMessage("Selected file is not a valid CSV file.");
+        }
+        initialize();
+    }
 
+    @FXML
+    private void importClassroomsFromCsv() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setTitle("Select Classrooms CSV File");
+        File file = fileChooser.showOpenDialog(null);
+        try {
+            Database.populateClassrooms(file);
+        }catch (Exception e){
+            showErrorMessage("Selected file is not a valid CSV file.");
+        }
 
+        initialize();
+    }
 }
