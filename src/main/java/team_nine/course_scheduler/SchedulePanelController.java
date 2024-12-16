@@ -31,7 +31,7 @@ public class SchedulePanelController {
     private enum Hour {
         EIGHT_THIRTY(1, "08:30"), NINE_TWENTY_FIVE(2, "09:25"), TEN_TWENTY(3, "10:20"), ELEVEN_FIFTEEN(4, "11:15"),
         TWELVE_TEN(5, "12:10"), ONE_FIVE(6, "13:05"), TWO(7, "14:00"), TWO_FIFTY_FIVE(8, "14:55"), THREE_FIFTY(9, "15:50"),
-        FOUR_FORTY_FIVE(10, "16:45"), FIVE_FORTY(11, "17:40"), SIX_THIRTY_FIVE(12, "18:35"), SEVEN_THIRTY(13, "19:30");
+        FOUR_FORTY_FIVE(10, "16:45"), FIVE_FORTY(11, "17:40"), SIX_THIRTY_FIVE(12, "18:35"), SEVEN_THIRTY(13, "19:30"), EIGHT_TWENTY_FIVE(14, "20:25"), NINE_TWENTY(15, "21:20"), TEN_FIFTEEN(16, "22:15");
 
         private final int order;
         private final String time;

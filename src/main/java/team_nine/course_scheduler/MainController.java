@@ -318,7 +318,7 @@ public class MainController {
                     MainController controller = loader.getController();
                     controller.courseHourSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 8,1));
                     String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
-                    String[] times = {"8:30", "9:25", "10:20", "11:15", "12:10", "13:05", "14:00", "14:55", "15:50", "16:45", "17:40", "18:35", "19:30"};
+                    String[] times = {"8:30", "9:25", "10:20", "11:15", "12:10", "13:05", "14:00", "14:55", "15:50", "16:45", "17:40", "18:35", "19:30", "20:25", "21:20", "22:15"};
                     controller.dayChoiceBox.setItems(FXCollections.observableArrayList(days));
                     controller.timeChoiceBox.setItems(FXCollections.observableArrayList(times));
                     controller.addCourseStudentList.setCellFactory(param -> new CheckBoxListCell<>(controller::createCheckBox));
