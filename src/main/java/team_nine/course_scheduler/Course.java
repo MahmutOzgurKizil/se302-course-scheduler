@@ -1,7 +1,6 @@
 package team_nine.course_scheduler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Course {
     private String time_to_start;

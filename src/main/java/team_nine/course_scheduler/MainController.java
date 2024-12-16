@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -359,23 +360,113 @@ public class MainController {
     @FXML
     public void onAddCourseClick() {
         Student[] students = selectedStudents.toArray(new Student[0]);
-
-        String courseName = courseNameTextField.getText();
-        String day = dayChoiceBox.getValue();
-        String time = timeChoiceBox.getValue();
-        String lecturer = courseLecturerTextField.getText();
-        String classroom = classroomChoiceBox.getValue().getClassroom();
+        String courseName = "";
+        String day = "";
+        String time = "";
+        String lecturer = "";
+        String classroom = "";
         int hour = courseHourSpinner.getValue();
+
+        if (classroomChoiceBox.getValue() != null) {
+            courseName = courseNameTextField.getText();
+            day = dayChoiceBox.getValue();
+            time = timeChoiceBox.getValue();
+            lecturer = courseLecturerTextField.getText();
+            classroom = classroomChoiceBox.getValue().getClassroom();
+
+        }
 
         if (courseName.isEmpty()||day.isEmpty()||time.isEmpty()||lecturer.isEmpty()||students.length == 0||classroom.isEmpty()) {
             showErrorMessage("All fields must be filled in.");
-
-        } else {
-            //Course newCourse = new Course(courseName, dateTime, lecturer, students, classroom, hour);
-            showSuccessMessage("Course added successfully!");
-            // save it in a database
-            // addCourseToList(newCourse);
+            return;
+        }else if (Database.getCourse(courseName) != null) {
+            showErrorMessage("Course with the same name already exists.");
+            return;
         }
+        else {
+            Course newCourse = new Course(courseName,day.concat(" "+time),lecturer,hour);
+
+            for (Student student : students) {
+                Course[] studentCourses = Database.getCoursesForStudentAllInfo(student.getName());
+                for (Course studentCourse : studentCourses) {
+                    String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
+                    String studentCourseDay = studentCourse.getTime_to_start().split(" ")[0];
+
+                    if (newCourseDay.equals(studentCourseDay)) {
+                        LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
+                        LocalTime studentCourseStartTime = LocalTime.parse(zeroPad(studentCourse.getTime_to_start().split(" ")[1]));
+                        if (doCoursesConflict(courseStartTime, newCourse.getDuration(), studentCourseStartTime, studentCourse.getDuration())) {
+                            showErrorMessage("Course conflicts with %s's schedule.".formatted(student.getName()));
+                            return;
+                        }
+                    }
+                }
+            }
+            {
+                Course[] lecturerCourses = Database.getCoursesForLecturerAllInfo(lecturer);
+                for (Course lecturerCourse : lecturerCourses) {
+                    String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
+                    String lecturerCourseDay = lecturerCourse.getTime_to_start().split(" ")[0];
+
+                    if (newCourseDay.equals(lecturerCourseDay)) {
+                        LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
+                        LocalTime lecturerCourseStartTime = LocalTime.parse(zeroPad(lecturerCourse.getTime_to_start().split(" ")[1]));
+                        if (doCoursesConflict(courseStartTime, newCourse.getDuration(), lecturerCourseStartTime, lecturerCourse.getDuration())) {
+                            showErrorMessage("Course conflicts with %s's schedule.".formatted(lecturer));
+                            return;
+                        }
+                    }
+                }
+            }
+
+            {
+                Course[] classroomCourses = Database.getCoursesForClassroomAllInfo(classroom);
+                for (Course classroomCourse : classroomCourses) {
+                    String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
+                    String classroomCourseDay = classroomCourse.getTime_to_start().split(" ")[0];
+
+                    if (newCourseDay.equals(classroomCourseDay)) {
+                        LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
+                        LocalTime classroomCourseStartTime = LocalTime.parse(zeroPad(classroomCourse.getTime_to_start().split(" ")[1]));
+                        if (doCoursesConflict(courseStartTime, newCourse.getDuration(), classroomCourseStartTime, classroomCourse.getDuration())) {
+                            showErrorMessage("Course conflicts with %s's schedule.".formatted(classroom));
+                            return;
+                        }
+                    }
+                }
+            }
+            LocalTime latestEndTime = LocalTime.parse("23:11");
+            LocalTime morningStartTime = LocalTime.parse("08:30");
+            LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
+            LocalTime courseEndTime = courseStartTime.plusMinutes(55 * newCourse.getDuration());
+                if ( courseEndTime.isAfter(latestEndTime)||
+                        courseEndTime.isBefore(morningStartTime)) {
+                    showErrorMessage("Course ends after 23:00.");
+                    return;
+                }
+
+        }
+
+        // ADD COURSE TO DATABASE
+        String[] studentNames = new String[students.length];
+        for (int i = 0; i < students.length; i++) {
+            studentNames[i] = students[i].getName();
+        }
+        Database.addCourse(courseName, day.concat(" "+time), hour,lecturer, studentNames);
+        Database.matchClassroom(courseName,classroom);
+        showSuccessMessage("Course added successfully!");
+    }
+    private static String zeroPad(String time) {
+        String[] parts = time.split(":");
+        String hour = parts[0].length() == 1 ? "0" + parts[0] : parts[0]; // Add leading zero if needed
+        return hour + ":" + parts[1];
+    }
+
+    private static boolean doCoursesConflict(LocalTime start1, int durationMultiplier1, LocalTime start2, int durationMultiplier2) {
+        int slotDuration = 55;
+        LocalTime end1 = start1.plusMinutes(slotDuration * durationMultiplier1);
+        LocalTime end2 = start2.plusMinutes(slotDuration * durationMultiplier2);
+        return start1.isBefore(end2) && start2.isBefore(end1);
     }
 
     private void showErrorMessage(String message) {

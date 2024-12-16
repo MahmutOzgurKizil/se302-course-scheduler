@@ -1,8 +1,4 @@
 package team_nine.course_scheduler;
-// This static class is responsible for creating and managing the database.
-// The database has 5 tables: Courses, Classrooms, Allocated, Students, and Enrollments.
-// The database is created in the user's home directory under the Documents folder.
-// The usage of the database is "Database.createAndConnectToDatabase()" etc.
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -463,4 +459,99 @@ public class Database {
         }
     }
 
+    public static Course[] getCoursesForStudentAllInfo(String student) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT *
+            FROM Courses
+            WHERE course IN (
+                SELECT course
+                FROM Enrollments
+                WHERE TRIM(student_name) = ?)
+        """)) {
+            stmt.setString(1, student);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                String courseName = rs.getString("course");
+                String timeToStart = rs.getString("time_to_start");
+                String lecturer = rs.getString("lecturer");
+                int duration = rs.getInt("duration");
+                courses.add(new Course(courseName, timeToStart, lecturer, duration));
+            }
+            return courses.toArray(new Course[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Course[0];
+        }
+    }
+
+    public static Course[] getCoursesForLecturerAllInfo(String lecturer) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT *
+            FROM Courses
+            WHERE TRIM(lecturer) = ?;
+        """)) {
+            stmt.setString(1, lecturer);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                String courseName = rs.getString("course");
+                String timeToStart = rs.getString("time_to_start");
+                int duration = rs.getInt("duration");
+                courses.add(new Course(courseName, timeToStart, lecturer, duration));
+            }
+            return courses.toArray(new Course[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Course[0];
+        }
+    }
+
+    public static Course[] getCoursesForClassroomAllInfo(String classroom) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT *
+            FROM Courses
+            WHERE course IN (
+                SELECT course
+                FROM Allocated
+                WHERE TRIM(classroom) = ?)
+        """)) {
+            stmt.setString(1, classroom);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                String courseName = rs.getString("course");
+                String timeToStart = rs.getString("time_to_start");
+                String lecturer = rs.getString("lecturer");
+                int duration = rs.getInt("duration");
+                courses.add(new Course(courseName, timeToStart, lecturer, duration));
+            }
+            return courses.toArray(new Course[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Course[0];
+        }
+    }
+
+    public static void enrollStudents(String course, String[] students) {
+        try (PreparedStatement insertStudent = conn.prepareStatement("""
+                INSERT OR IGNORE INTO Students (name)
+                VALUES (?);
+            """);
+             PreparedStatement insertEnrollment = conn.prepareStatement("""
+                INSERT OR IGNORE INTO Enrollments (course, student_name)
+                VALUES (?, ?);
+            """)) {
+            for (String student : students) {
+                insertStudent.setString(1, student);
+                insertEnrollment.setString(1, course);
+                insertEnrollment.setString(2, student);
+                insertStudent.execute();
+                insertEnrollment.execute();
+            }
+            System.out.println("Student added successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
