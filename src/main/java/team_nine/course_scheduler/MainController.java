@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainController {
     @FXML
@@ -83,6 +84,25 @@ public class MainController {
     private ArrayList<Student> selectedStudents = new ArrayList<>();
     @FXML
     private ChoiceBox<Classroom> classroomChoiceBox;
+    @FXML
+    private ListView<Student> searchStudentListView;
+    @FXML
+    private Button addStudentButton;
+    @FXML
+    private Button deleteStudentButton;
+    @FXML
+    private TextField searchStudentField;
+    @FXML
+    private Button searchStudentButton;
+    @FXML
+    private List<Student> selectedStudentsforAddDelete;
+    @FXML
+    private ChoiceBox<Course> courseChoiceBox;
+    private ObservableList<Course> courses;
+    private Course selectedCourse;
+    private ObservableList<Student> allStudents;
+    private ObservableList<Student> filteredStudents;
+
 
     @FXML
     public void initialize() {
@@ -358,4 +378,122 @@ public class MainController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    @FXML
+    public void initializeAddDeleteStudent() {
+        setupCourseChoiceBox();
+        setupStudentListView();
+        setupSearchFeature();
+
+    }
+
+    // Setup the ChoiceBox for courses
+    private void setupCourseChoiceBox() {
+        ObservableList<Course> courses = FXCollections.observableArrayList(Database.getAllCourses());
+        courseChoiceBox.setItems(courses);
+
+        courseChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldCourse, newCourse) -> {
+            if (newCourse != null) {
+                updateStudentListForCourse(newCourse);
+            }
+        });
+
+        if (!courses.isEmpty()) {
+            courseChoiceBox.getSelectionModel().select(0);
+            updateStudentListForCourse(courses.get(0));
+        }
+    }
+
+    // Setup the ListView for students
+    private void setupStudentListView() {
+        selectedStudents = new ArrayList<>();
+        searchStudentListView.setCellFactory(param -> new CheckBoxListCell<>(this::createCheckBox));
+    }
+
+    // Setup the search feature
+    private void setupSearchFeature() {
+        searchStudentButton.setOnAction(event -> filterStudentList());
+        searchStudentField.textProperty().addListener((obs, oldText, newText) -> filterStudentList()); // Filter on text change
+    }
+
+
+    // Update the student list based on the selected course
+    private void updateStudentListForCourse(Course course) {
+        String[] studentNames = course.getStudents().split(",\\s*");
+        allStudents = FXCollections.observableArrayList(Database.getAllStudents());
+
+        for (String name : studentNames) {
+            allStudents.add(new Student(name));
+        }
+
+        filteredStudents = FXCollections.observableArrayList(allStudents);
+        searchStudentListView.setItems(filteredStudents);
+    }
+
+    // Helper method to create a checkbox for each student
+    private ObservableValue<Boolean> createCheckBoxforStudent(Student student) {
+        SimpleBooleanProperty selected = new SimpleBooleanProperty();
+        selected.addListener((obs, wasSelected, isNowSelected) -> handleCheckBoxSelection(student, isNowSelected));
+        return selected;
+    }
+
+    // Handle checkbox selection
+    private void handleCheckBoxSelectionforStudent(Student student, boolean isSelected) {
+        if (isSelected) {
+            selectedStudents.add(student);
+        } else {
+            selectedStudents.remove(student);
+        }
+    }
+
+    // Method to filter the student list based on the search query
+    private void filterStudentList() {
+        String query = searchStudentField.getText().toLowerCase();
+        if (query.isEmpty()) {
+            filteredStudents.setAll(allStudents);
+        } else {
+            filteredStudents.setAll(allStudents.filtered(student -> student.getName().toLowerCase().contains(query)));
+        }
+    }
+
+    @FXML
+    private void addStudentsToCourse() {
+        Course selectedCourse = courseChoiceBox.getValue();
+        if (selectedCourse != null && !selectedStudents.isEmpty()) {
+            for (Student student : selectedStudents) {
+                System.out.println("Adding student: " + student.getName() + " to course: " + courseChoiceBox.getValue());
+            }
+        } else {
+            System.out.println("No students selected to add.");
+        }
+    }
+
+    @FXML
+    private void deleteStudentsFromCourse() {
+        Course selectedCourse = courseChoiceBox.getValue();
+        if (selectedCourse != null && !selectedStudents.isEmpty()) {
+            for (Student student : selectedStudents) {
+                System.out.println("Deleting student: " + student.getName() + " from course: " + courseChoiceBox.getValue());
+            }
+        } else {
+            System.out.println("No students selected to delete.");
+        }
+    }
+    @FXML
+    public void onaddDeleteStudentButtonClick(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/team_nine/course_scheduler/AddDeleteStudents.fxml"));
+            Stage stage = new Stage();
+           // stage.setTitle("Manage Student");
+            stage.setScene(new Scene(loader.load()));
+
+            MainController controller = loader.getController();
+            controller.initializeAddDeleteStudent();
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showErrorMessage("Unable to open the Manage Students window.");
+        }
+    }
+
+
 }
