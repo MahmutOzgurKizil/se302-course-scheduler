@@ -86,6 +86,11 @@ public class SchedulePanelController {
         createWeeklySchedule(Database.getCoursesForLecturer(lecturer));
     }
 
+    public void initializeForClassroom(String classroom) {
+        initialize("%s Schedule".formatted(classroom));
+        createWeeklySchedule(Database.getCoursesForClassroom(classroom));
+    }
+
     private void createWeeklySchedule(Course[] courses) {
         for (Course course : courses) {
             Course courseInfo = Database.getCourse(course.getCourse());

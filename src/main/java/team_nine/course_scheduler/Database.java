@@ -443,4 +443,24 @@ public class Database {
         }
     }
 
+    public static Course[] getCoursesForClassroom(String classroom) {
+        try (PreparedStatement stmt = conn.prepareStatement("""
+            SELECT course
+            FROM Allocated
+            WHERE TRIM(classroom) = ?;
+        """)) {
+            stmt.setString(1, classroom);
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                String courseName = rs.getString("course");
+                courses.add(new Course(courseName, "", "", 0));
+            }
+            return courses.toArray(new Course[0]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Course[0];
+        }
+    }
+
 }

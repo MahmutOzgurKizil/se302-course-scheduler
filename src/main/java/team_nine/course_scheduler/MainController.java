@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -43,7 +42,7 @@ public class MainController {
     @FXML
     private TableColumn courseLecturer;
     @FXML
-    private TableView classroomTableView;
+    private TableView<Classroom> classroomTableView;
     @FXML
     private TableColumn classroomNameColumn;
     @FXML
@@ -115,8 +114,6 @@ public class MainController {
     private ObservableList<String> classroomList = FXCollections.observableArrayList();
     @FXML
     private MenuItem optionallyAllocationWindowMenuItem;
-
-
 
 
     @FXML
@@ -229,14 +226,6 @@ public class MainController {
         String[] lecturerNames = Database.getAllLecturers();
         ObservableList<String> observableLecturerList = FXCollections.observableArrayList(lecturerNames);
 
-        /*if (lecturerNames.length == 0) {
-            System.out.println("No lecturers returned from the database!");
-        } else {
-            for (String name : lecturerNames) {
-                System.out.println("Lecturer Name: " + name);
-            }
-        }*/
-
         if (lecturerNameColumn == null) {
             System.out.println("lecturerNameColumn is null!");
             return;
@@ -244,11 +233,6 @@ public class MainController {
         lecturerNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
         lecturerTableView.setItems(observableLecturerList);
     }
-    @FXML
-    public void lecturerFillTableView() {
-        initializeLecturerList();
-    }
-
     @FXML
     public void handleLecturerSchedule() {
         try {
@@ -258,6 +242,21 @@ public class MainController {
             lecturerScheduleStage.setScene(new Scene(loader.load()));
             SchedulePanelController controller = loader.getController();
             controller.initializeForLecturer(lecturerTableView.getSelectionModel().getSelectedItem());
+            lecturerScheduleStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void handleClassroomSchedule() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SchedulePanel.fxml"));
+            Stage lecturerScheduleStage = new Stage();
+            lecturerScheduleStage.setTitle("Classroom Schedule");
+            lecturerScheduleStage.setScene(new Scene(loader.load()));
+            SchedulePanelController controller = loader.getController();
+            controller.initializeForClassroom(classroomTableView.getSelectionModel().getSelectedItem().getClassroom());
             lecturerScheduleStage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -336,7 +335,6 @@ public class MainController {
             alert.showAndWait();
         }
     }
-
 
     private ObservableValue<Boolean> createCheckBox(Student student) {
         SimpleBooleanProperty selected = new SimpleBooleanProperty();
@@ -427,7 +425,6 @@ public class MainController {
         searchStudentField.textProperty().addListener((obs, oldText, newText) -> filterStudentList()); // Filter on text change
     }
 
-
     private void updateStudentListForCourse(Course course) {
         //String[] studentNames = course.getStudents().split(",\\s*");
         String[] studentNames = Database.getStudentsInCourse(course.getCourse());
@@ -504,8 +501,6 @@ public class MainController {
         }
     }
 
-
-
     private void allocateCourseAndClassroom() {
         Course selectedCourse = selectcourseSwitchChoiceBox.getValue();
         Classroom selectedClassroom = selectclassroomSwitchChoiceBox.getValue();
@@ -516,7 +511,6 @@ public class MainController {
             System.out.println("Please select both a course and a classroom.");
         }
     }
-
 
     public void initializeOptionally() {
         optionallyAllocationWindowMenuItem.setOnAction(event -> openAllocationWindow());
