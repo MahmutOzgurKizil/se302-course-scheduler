@@ -561,18 +561,25 @@ public class MainController {
             for (Student student : selectedStudents) {
                 System.out.println("Adding student: " + student.getName() + " to course: " + courseChoiceBox.getValue());
             }
+
+            selectedCourse.addStudents(selectedStudents);
+            updateStudentListForCourse(selectedCourse);
         } else {
             System.out.println("No students selected to add.");
         }
     }
 
     @FXML
-    private void deleteStudentsFromCourse() {
+    private void deleteStudentsFromCourse(ActionEvent event) {
+        int i =0;
         Course selectedCourse = courseChoiceBox.getValue();
         if (selectedCourse != null && !selectedStudents.isEmpty()) {
             for (Student student : selectedStudents) {
                 System.out.println("Deleting student: " + student.getName() + " from course: " + courseChoiceBox.getValue());
+                selectedCourse.removeStudents(selectedStudents.get(i));
+                i++;
             }
+            updateStudentListForCourse(selectedCourse);
         } else {
             System.out.println("No students selected to delete.");
         }
