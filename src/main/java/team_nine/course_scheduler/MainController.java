@@ -561,7 +561,6 @@ public class MainController {
             for (Student student : selectedStudents) {
                 System.out.println("Adding student: " + student.getName() + " to course: " + courseChoiceBox.getValue());
             }
-
             selectedCourse.addStudents(selectedStudents);
             updateStudentListForCourse(selectedCourse);
         } else {
@@ -571,17 +570,26 @@ public class MainController {
 
     @FXML
     private void deleteStudentsFromCourse(ActionEvent event) {
-        int i =0;
+        int i = 0;
         Course selectedCourse = courseChoiceBox.getValue();
         if (selectedCourse != null && !selectedStudents.isEmpty()) {
-            for (Student student : selectedStudents) {
-                System.out.println("Deleting student: " + student.getName() + " from course: " + courseChoiceBox.getValue());
-                selectedCourse.removeStudents(selectedStudents.get(i));
-                i++;
+            try {
+                for (Student student : selectedStudents) {
+                    System.out.println("Deleting student: " + student.getName() + " from course: " + selectedCourse.getCourse());
+                    selectedCourse.removeStudents(selectedStudents.get(i)); // Remove the student
+                    i++;
+                }
+                // Update the UI to reflect changes
+                updateStudentListForCourse(selectedCourse);
+                showSuccessMessage("Selected students have been removed from the course successfully!");
+            } catch (Exception e) {
+                // Handle any exceptions that might occur
+                showErrorMessage("An error occurred while deleting students from the course.");
+                e.printStackTrace();
             }
-            updateStudentListForCourse(selectedCourse);
         } else {
-            System.out.println("No students selected to delete.");
+            // Handle case when no students or no course is selected
+            showErrorMessage("No course or students selected for deletion.");
         }
     }
     @FXML
