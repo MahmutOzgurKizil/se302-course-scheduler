@@ -1,6 +1,7 @@
 package team_nine.course_scheduler;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -174,7 +175,7 @@ public class Database {
     }
 
     public static void populateCourses(File file) {
-        try (Scanner sc = new Scanner(file)) {
+        try (Scanner sc = new Scanner(file, "UTF-8")) {
             sc.nextLine(); // Skip the header
             while (sc.hasNextLine()) {
                 String[] line = sc.nextLine().split(";");
@@ -188,7 +189,7 @@ public class Database {
     }
 
     public static void populateClassrooms(File file) {
-        try (Scanner sc = new Scanner(file)) {
+        try (Scanner sc = new Scanner(file, "UTF-8")) {
             sc.nextLine(); // Skip the header
             while (sc.hasNextLine()) {
                 String[] line = sc.nextLine().split(";");
