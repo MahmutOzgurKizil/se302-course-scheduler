@@ -27,17 +27,33 @@ public class Course {
     public void setLecturer(String lecturer) {this.lecturer = lecturer;}
     public void setTime_to_start(String time_to_start) {this.time_to_start = time_to_start;}
 
-    public void autoAssign(Course course){
-        Classroom[] PotentialClasses = Database.getAllClassrooms();
-        for(Classroom classroom : PotentialClasses){
-            if(isAvailable(classroom,course)&&Database.getCapacity(classroom)<=Database.getStudentNumber(course)){
-                Database.changeClassroom(course.course,classroom.getClassroom());
-                System.out.println("Course succesfully added to classroom: " + classroom.getClassroom() + " at time: "+course.time_to_start);
-                return;
+    public void autoAssign(Course course) {
+        Classroom[] potentialClasses = Database.getAllClassrooms();
+        if (potentialClasses == null || potentialClasses.length == 0) {
+            System.out.println("No classrooms available in the database.");
+            return;
+        }
+
+        try {
+            for (Classroom classroom : potentialClasses) {
+                if (isAvailable(classroom, course) && Database.getCapacity(classroom) >= Database.getStudentNumber(course)) {
+                    Database.matchClassroom(course.course, classroom.getClassroom());
+                    System.out.println("Course successfully added to classroom: " +
+                            classroom.getClassroom() + " at time: " + course.time_to_start);
+                    return;
+                }
             }
-            System.out.println("All Classrooms are occupied");
+            System.out.println("All classrooms are occupied or do not meet capacity requirements.");
+
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("IndexOutOfBoundsException: Ensure database and array logic are correct.");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred during autoAssign.");
+            e.printStackTrace();
         }
     }
+
 
     public void manualAssign(Course course, Classroom classroom){
         String theClassroom = Database.getAllocatedClassroom(classroom.getClassroom());
