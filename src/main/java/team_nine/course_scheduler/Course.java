@@ -1,5 +1,6 @@
 package team_nine.course_scheduler;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class Course {
@@ -115,14 +116,26 @@ public class Course {
         return temp;
     }
     public static boolean isAvailable(Classroom classroom,Course course){
-        String allocatedCourse = Database.getAllocatedCourse(classroom.getClassroom());
-        if(allocatedCourse==null&&iterateDate(course).time_to_start==null){
-            Database.matchClassroom(course.course,classroom.getClassroom());
-            return true;
+        for (Course classCourse : Database.getCoursesForClassroomAllInfo(classroom.getClassroom())){
+            LocalTime start1 = LocalTime.parse(zeroPad(course.getTime_to_start().split(" ")[1]));
+            LocalTime start2 = LocalTime.parse(zeroPad(classCourse.time_to_start).split(" ")[1]);
+            int durationMultiplier1 = course.getDuration();
+            int durationMultiplier2 = classCourse.getDuration();
+            int slotDuration = 55;
+            LocalTime end1 = start1.plusMinutes(slotDuration * durationMultiplier1);
+            LocalTime end2 = start2.plusMinutes(slotDuration * durationMultiplier2);
+            if ((start1.isBefore(end2) && start2.isBefore(end1))){
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
+    private static String zeroPad(String time) {
+        String[] parts = time.split(":");
+        String hour = parts[0].length() == 1 ? "0" + parts[0] : parts[0]; // Add leading zero if needed
+        return hour + ":" + parts[1];
+    }
     @Override
     public String toString() {
         return course;
