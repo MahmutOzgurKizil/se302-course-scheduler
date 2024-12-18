@@ -63,7 +63,7 @@ public class SchedulePanelController {
     private void initialize(String title) {
         scheduleTitleText.setText(title);
         for (Day day : Day.values()) {
-            gridPane.add(new Text(day.toString()), day.getValue(), 0);
+            gridPane.add(new Text(day.toString().toUpperCase()), day.getValue(), 0);
         }
         for (Hour hour : Hour.values()) {
             gridPane.add(new Text(hour.getTime()), 0, hour.getOrder());
