@@ -26,7 +26,7 @@
                     <items>
                         <Menu fx:id="assignClassroomMenuItem" mnemonicParsing="false" text="Assign Classroom">
                           <items>
-                              <MenuItem fx:id="automatically" mnemonicParsing="false" text="Automatically" />
+                              <MenuItem fx:id="automatically" mnemonicParsing="false" onAction="#handleAutoAssign" text="Automatically" />
                             <MenuItem fx:id="optionally" mnemonicParsing="false" onAction="#openAllocationWindow" text="Optionally" />
                           </items>
                         </Menu>

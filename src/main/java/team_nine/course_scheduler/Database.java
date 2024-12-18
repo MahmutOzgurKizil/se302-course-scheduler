@@ -303,7 +303,7 @@ public class Database {
 
     public static int getStudentNumber(Course course){
         try (PreparedStatement stmt = conn.prepareStatement("""
-        SELECT COUNT(*) FROM Enrollments WHERE course_name = ?
+        SELECT COUNT(*) FROM Enrollments WHERE course = ?
         """)){
             stmt.setString(1,course.getCourse());
             ResultSet rs = stmt.executeQuery();
@@ -315,7 +315,7 @@ public class Database {
 
     public static String getTimeOfCourse(Course course){
         try (PreparedStatement stmt = conn.prepareStatement("""
-        SELECT time_to_start FROM Courses WHERE course_name = ?
+        SELECT time_to_start FROM Courses WHERE course = ?
         """)){
             stmt.setString(1,course.getCourse());
             ResultSet rs = stmt.executeQuery();
@@ -327,11 +327,11 @@ public class Database {
 
     public static String getDuration(Course course){
         try (PreparedStatement stmt = conn.prepareStatement("""
-        SELECT duration FROM Courses WHERE course_name = ?
+        SELECT duration FROM Courses WHERE course = ?
         """)){
             stmt.setString(1,course.getCourse());
             ResultSet rs = stmt.executeQuery();
-            return rs.getString(2);
+            return rs.getString(1);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

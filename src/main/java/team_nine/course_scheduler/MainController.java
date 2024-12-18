@@ -570,4 +570,12 @@ public class MainController {
 
         initialize();
     }
+
+    @FXML
+    private void handleAutoAssign(){
+        Course[] courses = Database.getAllCourses();
+        for (Course course : courses) {
+            course.autoAssign(course);
+        }
+    }
 }
