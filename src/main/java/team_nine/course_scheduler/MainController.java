@@ -101,7 +101,7 @@ public class MainController {
     private List<Student> selectedStudentsforAddDelete;
     @FXML
     private ChoiceBox<Course> courseChoiceBox;
-    private ObservableList<Course> courses;
+    private ObservableList<Course> courses = FXCollections.observableArrayList();
     private Course selectedCourse;
     private ObservableList<Student> allStudents;
     private ObservableList<Student> filteredStudents;
@@ -127,7 +127,7 @@ public class MainController {
             courseDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
             courseLecturer.setCellValueFactory(new PropertyValueFactory<>("lecturer"));
 
-            ObservableList<Course> courses = FXCollections.observableArrayList(Database.getAllCourses());
+            courses = FXCollections.observableArrayList(Database.getAllCourses());
             courseTableView.setItems(courses);
 
             ObservableList<Classroom> classrooms = FXCollections.observableArrayList(Database.getAllClassrooms());
@@ -329,7 +329,7 @@ public class MainController {
 
                 }
             });
-            addCourseStage.show();
+            addCourseStage.showAndWait();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -337,13 +337,13 @@ public class MainController {
             alert.setContentText("There was an error opening the Add New Course window.");
             alert.showAndWait();
         }
+        courses = FXCollections.observableArrayList(Database.getAllCourses());
+        courseTableView.setItems(courses);
     }
 
     private ObservableValue<Boolean> createCheckBox(Student student) {
-        SimpleBooleanProperty selected = new SimpleBooleanProperty();
+        SimpleBooleanProperty selected = new SimpleBooleanProperty(selectedStudents.contains(student));
         selected.addListener((obs, wasSelected, isNowSelected) -> handleCheckBoxSelection(student, isNowSelected));
-        CheckBox checkBox = new CheckBox(student.getName());
-        checkBox.selectedProperty().bindBidirectional(selected);
         return selected;
     }
 
@@ -388,53 +388,16 @@ public class MainController {
 
             for (Student student : students) {
                 Course[] studentCourses = Database.getCoursesForStudentAllInfo(student.getName());
-                for (Course studentCourse : studentCourses) {
-                    String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
-                    String studentCourseDay = studentCourse.getTime_to_start().split(" ")[0];
-
-                    if (newCourseDay.equals(studentCourseDay)) {
-                        LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
-                        LocalTime studentCourseStartTime = LocalTime.parse(zeroPad(studentCourse.getTime_to_start().split(" ")[1]));
-                        if (doCoursesConflict(courseStartTime, newCourse.getDuration(), studentCourseStartTime, studentCourse.getDuration())) {
-                            showErrorMessage("Course conflicts with %s's schedule.".formatted(student.getName()));
-                            return;
-                        }
-                    }
-                }
+                if(doSchedulesConflict(student.getName(), newCourse, studentCourses)) return;
             }
             {
                 Course[] lecturerCourses = Database.getCoursesForLecturerAllInfo(lecturer);
-                for (Course lecturerCourse : lecturerCourses) {
-                    String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
-                    String lecturerCourseDay = lecturerCourse.getTime_to_start().split(" ")[0];
+                if (doSchedulesConflict(lecturer, newCourse, lecturerCourses)) return;
 
-                    if (newCourseDay.equals(lecturerCourseDay)) {
-                        LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
-                        LocalTime lecturerCourseStartTime = LocalTime.parse(zeroPad(lecturerCourse.getTime_to_start().split(" ")[1]));
-                        if (doCoursesConflict(courseStartTime, newCourse.getDuration(), lecturerCourseStartTime, lecturerCourse.getDuration())) {
-                            showErrorMessage("Course conflicts with %s's schedule.".formatted(lecturer));
-                            return;
-                        }
-                    }
-                }
-            }
-
-            {
                 Course[] classroomCourses = Database.getCoursesForClassroomAllInfo(classroom);
-                for (Course classroomCourse : classroomCourses) {
-                    String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
-                    String classroomCourseDay = classroomCourse.getTime_to_start().split(" ")[0];
-
-                    if (newCourseDay.equals(classroomCourseDay)) {
-                        LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
-                        LocalTime classroomCourseStartTime = LocalTime.parse(zeroPad(classroomCourse.getTime_to_start().split(" ")[1]));
-                        if (doCoursesConflict(courseStartTime, newCourse.getDuration(), classroomCourseStartTime, classroomCourse.getDuration())) {
-                            showErrorMessage("Course conflicts with %s's schedule.".formatted(classroom));
-                            return;
-                        }
-                    }
-                }
+                if (doSchedulesConflict(classroom, newCourse, classroomCourses)) return;
             }
+
             LocalTime latestEndTime = LocalTime.parse("23:11");
             LocalTime morningStartTime = LocalTime.parse("08:30");
             LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
@@ -456,6 +419,24 @@ public class MainController {
         Database.matchClassroom(courseName,classroom);
         showSuccessMessage("Course added successfully!");
     }
+
+    private boolean doSchedulesConflict(String classroom, Course newCourse, Course[] classroomCourses) {
+        for (Course classroomCourse : classroomCourses) {
+            String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
+            String classroomCourseDay = classroomCourse.getTime_to_start().split(" ")[0];
+
+            if (newCourseDay.equals(classroomCourseDay)) {
+                LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
+                LocalTime classroomCourseStartTime = LocalTime.parse(zeroPad(classroomCourse.getTime_to_start().split(" ")[1]));
+                if (doCoursesConflict(courseStartTime, newCourse.getDuration(), classroomCourseStartTime, classroomCourse.getDuration())) {
+                    showErrorMessage("Course conflicts with %s's schedule.".formatted(classroom));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private static String zeroPad(String time) {
         String[] parts = time.split(":");
         String hour = parts[0].length() == 1 ? "0" + parts[0] : parts[0]; // Add leading zero if needed
