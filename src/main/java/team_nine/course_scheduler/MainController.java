@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +101,7 @@ public class MainController {
     private List<Student> selectedStudentsforAddDelete;
     @FXML
     private ChoiceBox<Course> courseChoiceBox;
-    private ObservableList<Course> courses;
+    private ObservableList<Course> courses = FXCollections.observableArrayList();
     private Course selectedCourse;
     private ObservableList<Student> allStudents;
     private ObservableList<Student> filteredStudents;
@@ -126,7 +127,7 @@ public class MainController {
             courseDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
             courseLecturer.setCellValueFactory(new PropertyValueFactory<>("lecturer"));
 
-            ObservableList<Course> courses = FXCollections.observableArrayList(Database.getAllCourses());
+            courses = FXCollections.observableArrayList(Database.getAllCourses());
             courseTableView.setItems(courses);
 
             ObservableList<Classroom> classrooms = FXCollections.observableArrayList(Database.getAllClassrooms());
@@ -328,7 +329,7 @@ public class MainController {
 
                 }
             });
-            addCourseStage.show();
+            addCourseStage.showAndWait();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -336,13 +337,13 @@ public class MainController {
             alert.setContentText("There was an error opening the Add New Course window.");
             alert.showAndWait();
         }
+        courses = FXCollections.observableArrayList(Database.getAllCourses());
+        courseTableView.setItems(courses);
     }
 
     private ObservableValue<Boolean> createCheckBox(Student student) {
-        SimpleBooleanProperty selected = new SimpleBooleanProperty();
+        SimpleBooleanProperty selected = new SimpleBooleanProperty(selectedStudents.contains(student));
         selected.addListener((obs, wasSelected, isNowSelected) -> handleCheckBoxSelection(student, isNowSelected));
-        CheckBox checkBox = new CheckBox(student.getName());
-        checkBox.selectedProperty().bindBidirectional(selected);
         return selected;
     }
 
@@ -359,23 +360,94 @@ public class MainController {
     @FXML
     public void onAddCourseClick() {
         Student[] students = selectedStudents.toArray(new Student[0]);
-
-        String courseName = courseNameTextField.getText();
-        String day = dayChoiceBox.getValue();
-        String time = timeChoiceBox.getValue();
-        String lecturer = courseLecturerTextField.getText();
-        String classroom = classroomChoiceBox.getValue().getClassroom();
+        String courseName = "";
+        String day = "";
+        String time = "";
+        String lecturer = "";
+        String classroom = "";
         int hour = courseHourSpinner.getValue();
+
+        if (classroomChoiceBox.getValue() != null) {
+            courseName = courseNameTextField.getText();
+            day = dayChoiceBox.getValue();
+            time = timeChoiceBox.getValue();
+            lecturer = courseLecturerTextField.getText();
+            classroom = classroomChoiceBox.getValue().getClassroom();
+
+        }
 
         if (courseName.isEmpty()||day.isEmpty()||time.isEmpty()||lecturer.isEmpty()||students.length == 0||classroom.isEmpty()) {
             showErrorMessage("All fields must be filled in.");
-
-        } else {
-            //Course newCourse = new Course(courseName, dateTime, lecturer, students, classroom, hour);
-            showSuccessMessage("Course added successfully!");
-            // save it in a database
-            // addCourseToList(newCourse);
+            return;
+        }else if (Database.getCourse(courseName) != null) {
+            showErrorMessage("Course with the same name already exists.");
+            return;
         }
+        else {
+            Course newCourse = new Course(courseName,day.concat(" "+time),lecturer,hour);
+
+            for (Student student : students) {
+                Course[] studentCourses = Database.getCoursesForStudentAllInfo(student.getName());
+                if(doSchedulesConflict(student.getName(), newCourse, studentCourses)) return;
+            }
+            {
+                Course[] lecturerCourses = Database.getCoursesForLecturerAllInfo(lecturer);
+                if (doSchedulesConflict(lecturer, newCourse, lecturerCourses)) return;
+
+                Course[] classroomCourses = Database.getCoursesForClassroomAllInfo(classroom);
+                if (doSchedulesConflict(classroom, newCourse, classroomCourses)) return;
+            }
+
+            LocalTime latestEndTime = LocalTime.parse("23:11");
+            LocalTime morningStartTime = LocalTime.parse("08:30");
+            LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
+            LocalTime courseEndTime = courseStartTime.plusMinutes(55 * newCourse.getDuration());
+                if ( courseEndTime.isAfter(latestEndTime)||
+                        courseEndTime.isBefore(morningStartTime)) {
+                    showErrorMessage("Course ends after 23:00.");
+                    return;
+                }
+
+        }
+
+        // ADD COURSE TO DATABASE
+        String[] studentNames = new String[students.length];
+        for (int i = 0; i < students.length; i++) {
+            studentNames[i] = students[i].getName();
+        }
+        Database.addCourse(courseName, day.concat(" "+time), hour,lecturer, studentNames);
+        Database.matchClassroom(courseName,classroom);
+        showSuccessMessage("Course added successfully!");
+    }
+
+    private boolean doSchedulesConflict(String classroom, Course newCourse, Course[] classroomCourses) {
+        for (Course classroomCourse : classroomCourses) {
+            String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
+            String classroomCourseDay = classroomCourse.getTime_to_start().split(" ")[0];
+
+            if (newCourseDay.equals(classroomCourseDay)) {
+                LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
+                LocalTime classroomCourseStartTime = LocalTime.parse(zeroPad(classroomCourse.getTime_to_start().split(" ")[1]));
+                if (doCoursesConflict(courseStartTime, newCourse.getDuration(), classroomCourseStartTime, classroomCourse.getDuration())) {
+                    showErrorMessage("Course conflicts with %s's schedule.".formatted(classroom));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static String zeroPad(String time) {
+        String[] parts = time.split(":");
+        String hour = parts[0].length() == 1 ? "0" + parts[0] : parts[0]; // Add leading zero if needed
+        return hour + ":" + parts[1];
+    }
+
+    private static boolean doCoursesConflict(LocalTime start1, int durationMultiplier1, LocalTime start2, int durationMultiplier2) {
+        int slotDuration = 55;
+        LocalTime end1 = start1.plusMinutes(slotDuration * durationMultiplier1);
+        LocalTime end2 = start2.plusMinutes(slotDuration * durationMultiplier2);
+        return start1.isBefore(end2) && start2.isBefore(end1);
     }
 
     private void showErrorMessage(String message) {
@@ -470,20 +542,35 @@ public class MainController {
             for (Student student : selectedStudents) {
                 System.out.println("Adding student: " + student.getName() + " to course: " + courseChoiceBox.getValue());
             }
+            selectedCourse.addStudents(selectedStudents);
+            updateStudentListForCourse(selectedCourse);
         } else {
             System.out.println("No students selected to add.");
         }
     }
 
     @FXML
-    private void deleteStudentsFromCourse() {
+    private void deleteStudentsFromCourse(ActionEvent event) {
+        int i = 0;
         Course selectedCourse = courseChoiceBox.getValue();
         if (selectedCourse != null && !selectedStudents.isEmpty()) {
-            for (Student student : selectedStudents) {
-                System.out.println("Deleting student: " + student.getName() + " from course: " + courseChoiceBox.getValue());
+            try {
+                for (Student student : selectedStudents) {
+                    System.out.println("Deleting student: " + student.getName() + " from course: " + selectedCourse.getCourse());
+                    selectedCourse.removeStudents(selectedStudents.get(i)); // Remove the student
+                    i++;
+                }
+                // Update the UI to reflect changes
+                updateStudentListForCourse(selectedCourse);
+                showSuccessMessage("Selected students have been removed from the course successfully!");
+            } catch (Exception e) {
+                // Handle any exceptions that might occur
+                showErrorMessage("An error occurred while deleting students from the course.");
+                e.printStackTrace();
             }
         } else {
-            System.out.println("No students selected to delete.");
+            // Handle case when no students or no course is selected
+            showErrorMessage("No course or students selected for deletion.");
         }
     }
     @FXML

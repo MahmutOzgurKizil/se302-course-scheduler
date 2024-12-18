@@ -21,11 +21,16 @@ public class CourseInfoPanelController {
 
     public void initialize(Course course){
         courseNameText.setText(course.getCourse());
+        String classroom = Database.getAllocatedClassroom(course.getCourse());
+        if (classroom == null) {
+            classroom = "Not allocated";
+        }
         courseDetailsTextArea.setText("""
                 Lecturer: %s
                 Start Time: %s
                 Duration: %s
-                """.formatted(course.getLecturer(), course.getTime_to_start(), course.getDuration()));
+                Classroom: %s
+                """.formatted(course.getLecturer(), course.getTime_to_start(), course.getDuration(), classroom));
 
         studentListView.setItems(FXCollections.observableArrayList(Database.getStudentsInCourse(course.getCourse())));
     }

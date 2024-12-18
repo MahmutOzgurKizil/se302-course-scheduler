@@ -15,7 +15,7 @@ public class SchedulePanelController {
     private GridPane gridPane;
 
     private enum Day {
-        MONDAY(1), TUESDAY(2), WEDNESDAY(3), THURSDAY(4), FRIDAY(5);
+        monday(1), tuesday(2), wednesday(3), thursday(4), friday(5);
 
         private final int value;
 
@@ -63,7 +63,7 @@ public class SchedulePanelController {
     private void initialize(String title) {
         scheduleTitleText.setText(title);
         for (Day day : Day.values()) {
-            gridPane.add(new Text(day.toString()), day.getValue(), 0);
+            gridPane.add(new Text(day.toString().toUpperCase()), day.getValue(), 0);
         }
         for (Hour hour : Hour.values()) {
             gridPane.add(new Text(hour.getTime()), 0, hour.getOrder());
@@ -95,7 +95,7 @@ public class SchedulePanelController {
         for (Course course : courses) {
             Course courseInfo = Database.getCourse(course.getCourse());
             String[] dateTimeSplit = courseInfo.getTime_to_start().split(" ");
-            int day = Day.valueOf(dateTimeSplit[0].toUpperCase()).getValue();
+            int day = Day.valueOf(dateTimeSplit[0].toLowerCase()).getValue();
             int time = Hour.fromTime(dateTimeSplit[1]).getOrder();
             String rdColor = getRandomColor();
             for (int i = 0; i < courseInfo.getDuration(); i++) {
