@@ -134,7 +134,7 @@ public class Course {
     public static boolean isAvailable(Classroom classroom,Course course){
         for (Course classCourse : Database.getCoursesForClassroomAllInfo(classroom.getClassroom())){
             LocalTime start1 = LocalTime.parse(zeroPad(course.getTime_to_start().split(" ")[1]));
-            LocalTime start2 = LocalTime.parse(zeroPad(classCourse.time_to_start).split(" ")[1]);
+            LocalTime start2 = LocalTime.parse(zeroPad(classCourse.time_to_start.split(" ")[1]));
             int durationMultiplier1 = course.getDuration();
             int durationMultiplier2 = classCourse.getDuration();
             int slotDuration = 55;

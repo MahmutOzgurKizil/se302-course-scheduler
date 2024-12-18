@@ -288,7 +288,7 @@ public class Database {
 
     public static int getCapacity(Classroom classroom){
         try (PreparedStatement stmt = conn.prepareStatement("""
-            SELECT capacity FROM Classrooms WHERE classroom_name = ?
+            SELECT capacity FROM Classrooms WHERE classroom = ?
             """)){
             stmt.setString(1,classroom.getClassroom());
             ResultSet rs = stmt.executeQuery();
