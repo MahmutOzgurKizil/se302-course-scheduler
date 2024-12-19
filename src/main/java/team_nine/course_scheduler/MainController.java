@@ -597,6 +597,7 @@ public class MainController {
         }
     }
 
+    @FXML
     private void allocateCourseAndClassroom() {
         Course selectedCourse = selectcourseSwitchChoiceBox.getValue();
         Classroom selectedClassroom = selectclassroomSwitchChoiceBox.getValue();
