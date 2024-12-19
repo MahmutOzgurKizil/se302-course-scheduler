@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -358,7 +359,7 @@ public class MainController {
     }
 
     @FXML
-    public void onAddCourseClick() {
+    public void onAddCourseClick(ActionEvent event) {
         Student[] students = selectedStudents.toArray(new Student[0]);
         String courseName = "";
         String day = "";
@@ -418,6 +419,9 @@ public class MainController {
         Database.addCourse(courseName, day.concat(" "+time), hour,lecturer, studentNames);
         Database.matchClassroom(courseName,classroom);
         showSuccessMessage("Course added successfully!");
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
+
     }
 
     private boolean doSchedulesConflict(String classroom, Course newCourse, Course[] classroomCourses) {
@@ -672,5 +676,11 @@ public class MainController {
         for (Course course : courses) {
             course.autoAssign(course);
         }
+    }
+
+    @FXML
+    private void allocationWindowCancel(){
+        Stage stage = (Stage) cancelButton.getScene().getWindow();
+        stage.close();
     }
 }
