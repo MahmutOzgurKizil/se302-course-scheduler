@@ -540,7 +540,14 @@ public class MainController {
         Course selectedCourse = courseChoiceBox.getValue();
         if (selectedCourse != null && !selectedStudents.isEmpty()) {
             for (Student student : selectedStudents) {
-                System.out.println("Adding student: " + student.getName() + " to course: " + courseChoiceBox.getValue());
+                Course[] studentCourses = Database.getCoursesForStudentAllInfo(student.getName());
+                for (Course studentCourse: studentCourses){
+                    if (doCoursesConflict(LocalTime.parse(zeroPad(selectedCourse.getTime_to_start().split(" ")[1])),
+                            selectedCourse.getDuration(), LocalTime.parse(zeroPad(studentCourse.getTime_to_start().split(" ")[1])), studentCourse.getDuration())) {
+                        showErrorMessage("Course conflicts with %s's schedule.".formatted(student.getName()));
+                        return;
+                    }
+                }
             }
             selectedCourse.addStudents(selectedStudents);
             updateStudentListForCourse(selectedCourse);

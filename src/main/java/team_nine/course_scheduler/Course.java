@@ -99,10 +99,8 @@ public class Course {
 
     public void addStudents(ArrayList<Student> students){
         String[] EnrolledStudents = new  String[students.size()];
-        int i =0;
-        for(Student s : students){
-            i++;
-            EnrolledStudents[i]= String.valueOf(students.get(i));
+        for (int i = 0; i < students.size(); i++) {
+            EnrolledStudents[i] = students.get(i).getName();
         }
         Database.addStudent(course,EnrolledStudents);
     }
