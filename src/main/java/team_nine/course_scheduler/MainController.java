@@ -504,7 +504,7 @@ public class MainController {
     }
 
     private void updateStudentListForCourse(Course course) {
-        //String[] studentNames = course.getStudents().split(",\\s*");
+        selectedStudents.clear();
         String[] studentNames = Database.getStudentsInCourse(course.getCourse());
         allStudents = FXCollections.observableArrayList(Database.getAllStudents());
 
@@ -545,12 +545,9 @@ public class MainController {
         if (selectedCourse != null && !selectedStudents.isEmpty()) {
             for (Student student : selectedStudents) {
                 Course[] studentCourses = Database.getCoursesForStudentAllInfo(student.getName());
-                for (Course studentCourse: studentCourses){
-                    if (doCoursesConflict(LocalTime.parse(zeroPad(selectedCourse.getTime_to_start().split(" ")[1])),
-                            selectedCourse.getDuration(), LocalTime.parse(zeroPad(studentCourse.getTime_to_start().split(" ")[1])), studentCourse.getDuration())) {
-                        showErrorMessage("Course conflicts with %s's schedule.".formatted(student.getName()));
-                        return;
-                    }
+                if (doSchedulesConflict(student.getName(), selectedCourse, studentCourses)){
+                    showErrorMessage("Course conflicts with %s's schedule.".formatted(student.getName()));
+                    return;
                 }
             }
             selectedCourse.addStudents(selectedStudents);
@@ -574,6 +571,8 @@ public class MainController {
                 // Update the UI to reflect changes
                 updateStudentListForCourse(selectedCourse);
                 showSuccessMessage("Selected students have been removed from the course successfully!");
+                selectedStudents.clear();
+
             } catch (Exception e) {
                 // Handle any exceptions that might occur
                 showErrorMessage("An error occurred while deleting students from the course.");

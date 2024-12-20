@@ -1,7 +1,6 @@
 package team_nine.course_scheduler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -268,23 +267,6 @@ public class Database {
             return null;
         }
     }
-    /*
-    public static boolean getAvailability(Classroom classroom, String DesiredTime) {
-        try (PreparedStatement stmt = conn.prepareStatement("""
-                SELECT time_to_start, duration FROM Courses WHERE classroom_name = ? AND ? BETWEEN time_to_start AND DATE_ADD(time_to_start, INTERVAL duration MINUTE)
-                """)) {
-            stmt.setString(1, classroom.getClassroom());
-            stmt.setString(2, DesiredTime);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) { return false; }
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return true;
-    }
-     */
 
     public static int getCapacity(Classroom classroom){
         try (PreparedStatement stmt = conn.prepareStatement("""
@@ -331,18 +313,6 @@ public class Database {
             return rs.getString(1);
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }
-    }
-    public static String getAllocatedCourse(String classroom) {
-        try (PreparedStatement stmt = conn.prepareStatement("""
-                SELECT course FROM Allocated WHERE classroom = ?;
-            """)) {
-            stmt.setString(1, classroom);
-            ResultSet rs = stmt.executeQuery();
-            return rs.getString("course");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
@@ -534,25 +504,4 @@ public class Database {
         }
     }
 
-    public static void enrollStudents(String course, String[] students) {
-        try (PreparedStatement insertStudent = conn.prepareStatement("""
-                INSERT OR IGNORE INTO Students (name)
-                VALUES (?);
-            """);
-             PreparedStatement insertEnrollment = conn.prepareStatement("""
-                INSERT OR IGNORE INTO Enrollments (course, student_name)
-                VALUES (?, ?);
-            """)) {
-            for (String student : students) {
-                insertStudent.setString(1, student);
-                insertEnrollment.setString(1, course);
-                insertEnrollment.setString(2, student);
-                insertStudent.execute();
-                insertEnrollment.execute();
-            }
-            System.out.println("Student added successfully.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }
