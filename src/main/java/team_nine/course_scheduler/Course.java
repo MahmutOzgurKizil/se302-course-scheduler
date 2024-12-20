@@ -19,10 +19,13 @@ public class Course {
 
     //Setters & Getters
     public String getCourse() {return course;}
+    public void setCourse(String course) {this.course = course;}
     public int getDuration() {return duration;}
     public String getLecturer() {return lecturer;}
     public String getTime_to_start() {return time_to_start;}
-
+    public void setDuration(int duration) {this.duration = duration;}
+    public void setLecturer(String lecturer) {this.lecturer = lecturer;}
+    public void setTime_to_start(String time_to_start) {this.time_to_start = time_to_start;}
 
     public void autoAssign(Course course) {
         Classroom[] potentialClasses = Database.getAllClassrooms();
@@ -35,7 +38,7 @@ public class Course {
             for (Classroom classroom : potentialClasses) {
                 if (isAvailable(classroom, course) && Database.getCapacity(classroom) >= Database.getStudentNumber(course)) {
                     Database.matchClassroom(course.course, classroom.getClassroom());
-                    System.out.println("Course successfully added to classroom: " +
+                    System.out.println(course.getCourse() + "Course successfully added to classroom: " +
                             classroom.getClassroom() + " at time: " + course.time_to_start);
                     return;
                 }
@@ -52,22 +55,23 @@ public class Course {
     }
 
 
-    public void manualAssign(Course course, Classroom classroom){
-        String theClassroom = Database.getAllocatedClassroom(classroom.getClassroom());
-        String theCourse = course.getCourse();
+    public void manualAssign(Course course, Classroom classroom) throws Exception {
 
-        try {
-            //if available match if else dont do anything
-            if(isAvailable(classroom,course)){
-                Database.matchClassroom(theCourse,theClassroom);
-            }else{
-                System.out.println("classroom occup'ed");
 
+            if (isAvailable(classroom,course) && Database.getCapacity(classroom) >= Database.getStudentNumber(course)) {
+                System.out.println(course.getCourse() + "Course successfully added to classroom: " +
+                        classroom.getClassroom() + " at time: " + course.time_to_start);
+                        Database.changeClassroom(this.course, classroom.getClassroom());
+            } else {
+                throw new Exception();
             }
-        }catch(Exception e){
-            System.out.println("Error when assigning classroom");
-            e.printStackTrace();
-        }
+    }
+
+
+
+    public void createCourse(String time_to_start,String course, String lecturer, int duration){
+        Course NewCourse = new Course(time_to_start,course,lecturer,duration);
+        Database.addCourse(course,time_to_start,duration,lecturer,null);
     }
 
 

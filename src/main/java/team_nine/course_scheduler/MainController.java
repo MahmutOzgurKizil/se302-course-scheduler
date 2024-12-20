@@ -296,7 +296,37 @@ public class MainController {
 
         Text titleText = new Text("Help Instructions\n");
         titleText.setStyle("-fx-font-size: 16px;-fx-font-weight:bold;");
-        Text instructionsText = new Text("EMPTY\n");
+        Text instructionsText = new Text("""
+                Course Scheduler
+                                        
+                This guide is here to help you with the key features of the program, including the processes for creating a course, importing sets of classes and courses along with it’s students, assigning courses to classrooms and making changes to the course-classroom relations if appropriate.
+                                        
+                Operations
+                                        
+                Create a course: To create a new course, click on the “add new course” option under the “Actions” menu. The program will request	the entry of information such as date/time, name, lecturer, classroom, duration of the course, students that will take the course.
+                                        
+                Import csv file: Select “Import courses” or “Import classrooms to load data from an existing css file. Go to the desired file path, choose the css file, and the program will import all the contained classrooms or courses.
+                                        
+                Add/Delete Students: Select “Add/Delete Student in order to make changes to the list of students taking a course. Select the course first then select the relevant students from the list of students then click on “add” or “delete”.
+                                        
+                Assign classrooms automatically: Click on the “Assign Classroom” button in order to allocate all the free courses to the free classes if possible.
+                                        
+                Assign classrooms manually: Click on the “Assign Classroom” button, select the desired course and a classroom and click allocate. The program will allocate the course to the classroom if the desired classroom is available at the time and the capacity is enough for the course.
+                                        
+                                        
+                                        
+                                        
+                Searching and Filtering\s
+                                        
+                Students list: Click “Students” in order to see the list of students and select individually in order to see the student’s weekly schedule.
+                                        
+                Lecturers list:  Click “Lecturers” in order to see the list of lecturers and select individually in order to see the lecturer’s weekly schedule.
+                                        
+                Courses list: The list of courses is visible through the main menu. Click on a course to see its details such as Lecturer, Start Time, Duration, Classroom and the list of students that are taking that course.
+                                        
+                Classrooms list: The list of classrooms is visible through the main menu. The name of the classrooms and their capacities is visible directly. Click in a classroom to see its schedule.
+                
+                        """);
         textFlow.getChildren().addAll(titleText, instructionsText);
 
         ScrollPane scrollPane = new ScrollPane(textFlow);
@@ -599,14 +629,28 @@ public class MainController {
             showErrorMessage("Unable to open the this window.");
         }
     }
-
     @FXML
     private void allocateCourseAndClassroom() {
-        Course selectedCourse = selectcourseSwitchChoiceBox.getValue();
-        Classroom selectedClassroom = selectclassroomSwitchChoiceBox.getValue();
+      Course selectedCourse = selectcourseSwitchChoiceBox.getValue();
+      Classroom selectedClassroom = selectclassroomSwitchChoiceBox.getValue();
+        if(selectedClassroom == null){
+            System.out.println("Please select a classroom");
+
+            return;
+        }
+        if(selectedCourse == null){
+            System.out.println("please select a course");
+            return;
+        }
 
         if (!selectedCourse.getCourse().isEmpty() && !selectedClassroom.getClassroom().isEmpty()) {
-            System.out.println("Allocated " + selectedCourse + " to " + selectedClassroom);
+            try{
+                selectedCourse.manualAssign(selectedCourse, selectedClassroom);
+                showSuccessMessage("The course was successfully assigned to the classroom");
+            }
+            catch (Exception e) {
+                showErrorMessage("Error while matching the course to the classroom(Classroom might be busy at that time or the capacity might not be enough.");
+            }
         } else {
             System.out.println("Please select both a course and a classroom.");
         }
@@ -682,4 +726,14 @@ public class MainController {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
+
+    @FXML
+    private void onCancelButtonClick() {
+        selectcourseSwitchChoiceBox.getSelectionModel().clearSelection();
+        selectclassroomSwitchChoiceBox.getSelectionModel().clearSelection();
+
+    }
+
+
+
 }
