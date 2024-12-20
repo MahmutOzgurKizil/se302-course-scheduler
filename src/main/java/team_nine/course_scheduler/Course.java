@@ -38,7 +38,7 @@ public class Course {
             for (Classroom classroom : potentialClasses) {
                 if (isAvailable(classroom, course) && Database.getCapacity(classroom) >= Database.getStudentNumber(course)) {
                     Database.matchClassroom(course.course, classroom.getClassroom());
-                    System.out.println("Course successfully added to classroom: " +
+                    System.out.println(course.getCourse() + "Course successfully added to classroom: " +
                             classroom.getClassroom() + " at time: " + course.time_to_start);
                     return;
                 }
@@ -55,23 +55,19 @@ public class Course {
     }
 
 
-    public void manualAssign(Course course, Classroom classroom){
-        String theClassroom = Database.getAllocatedClassroom(classroom.getClassroom());
-        String theCourse = course.getCourse();
+    public void manualAssign(Course course, Classroom classroom) throws Exception {
 
-    try {
-        //if available match if else dont do anything
-        if(isAvailable(classroom,course)){
-            Database.matchClassroom(theCourse,theClassroom);
-        }else{
-            System.out.println("classroom occup'ed");
 
-        }
-    }catch(Exception e){
-        System.out.println("Error when assigning classroom");
-        e.printStackTrace();
+            if (isAvailable(classroom,course) && Database.getCapacity(classroom) >= Database.getStudentNumber(course)) {
+                System.out.println(course.getCourse() + "Course successfully added to classroom: " +
+                        classroom.getClassroom() + " at time: " + course.time_to_start);
+                        Database.changeClassroom(this.course, classroom.getClassroom());
+            } else {
+                throw new Exception();
+            }
     }
-    }
+
+
 
     public void createCourse(String time_to_start,String course, String lecturer, int duration){
         Course NewCourse = new Course(time_to_start,course,lecturer,duration);
@@ -110,36 +106,21 @@ public class Course {
         Database.removeStudent(course,withdrawal);
     }
 
-    public static Course iterateDate(Course course){
-        String date = Database.getTimeOfCourse(course);
-        int duration = Integer.parseInt(Database.getDuration(course));
-        String[] SplitDate = date.split(" ");
-        String[] PossibleTimes ={"08:30","09:25","10:20","11:15",
-                                "12:10","13:05", "14:00","14:55",
-                                "15:50","16:45","17:40","18:35"
-                                ,"19:30","20:25","21:20","22:15"};
-        int i = 0;
-        for (String s : PossibleTimes){
-            if(SplitDate[1]==s){
-                String temp = s;
-                break;
-            }
-            i++;
-        }
-        Course temp = new Course(PossibleTimes[i+duration], "","" , 0);
-        return temp;
-    }
     public static boolean isAvailable(Classroom classroom,Course course){
         for (Course classCourse : Database.getCoursesForClassroomAllInfo(classroom.getClassroom())){
-            LocalTime start1 = LocalTime.parse(zeroPad(course.getTime_to_start().split(" ")[1]));
-            LocalTime start2 = LocalTime.parse(zeroPad(classCourse.time_to_start.split(" ")[1]));
-            int durationMultiplier1 = course.getDuration();
-            int durationMultiplier2 = classCourse.getDuration();
-            int slotDuration = 55;
-            LocalTime end1 = start1.plusMinutes(slotDuration * durationMultiplier1);
-            LocalTime end2 = start2.plusMinutes(slotDuration * durationMultiplier2);
-            if ((start1.isBefore(end2) && start2.isBefore(end1))){
-                return false;
+            String newCourseDay = course.getTime_to_start().split(" ")[0];
+            String classroomCourseDay = classCourse.getTime_to_start().split(" ")[0];
+            if (newCourseDay.equals(classroomCourseDay)){
+                LocalTime start1 = LocalTime.parse(zeroPad(course.getTime_to_start().split(" ")[1]));
+                LocalTime start2 = LocalTime.parse(zeroPad(classCourse.time_to_start.split(" ")[1]));
+                int durationMultiplier1 = course.getDuration();
+                int durationMultiplier2 = classCourse.getDuration();
+                int slotDuration = 55;
+                LocalTime end1 = start1.plusMinutes(slotDuration * durationMultiplier1);
+                LocalTime end2 = start2.plusMinutes(slotDuration * durationMultiplier2);
+                if ((start1.isBefore(end2) && start2.isBefore(end1))){
+                    return false;
+                }
             }
         }
         return true;
