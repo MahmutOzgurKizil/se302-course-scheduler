@@ -1,5 +1,6 @@
 package team_nine.course_scheduler;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -8,9 +9,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
@@ -18,8 +24,10 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -294,47 +302,79 @@ public class MainController {
 
         TextFlow textFlow = new TextFlow();
 
-        Text titleText = new Text("Help Instructions\n");
-        titleText.setStyle("-fx-font-size: 16px;-fx-font-weight:bold;");
-        Text instructionsText = new Text("""
-                Course Scheduler
-                                        
-                This guide is here to help you with the key features of the program, including the processes for creating a course, importing sets of classes and courses along with it’s students, assigning courses to classrooms and making changes to the course-classroom relations if appropriate.
-                                        
-                Operations
-                                        
-                Create a course: To create a new course, click on the “add new course” option under the “Actions” menu. The program will request	the entry of information such as date/time, name, lecturer, classroom, duration of the course, students that will take the course.
-                                        
-                Import csv file: Select “Import courses” or “Import classrooms to load data from an existing css file. Go to the desired file path, choose the css file, and the program will import all the contained classrooms or courses.
-                                        
-                Add/Delete Students: Select “Add/Delete Student in order to make changes to the list of students taking a course. Select the course first then select the relevant students from the list of students then click on “add” or “delete”.
-                                        
-                Assign classrooms automatically: Click on the “Assign Classroom” button in order to allocate all the free courses to the free classes if possible.
-                                        
-                Assign classrooms manually: Click on the “Assign Classroom” button, select the desired course and a classroom and click allocate. The program will allocate the course to the classroom if the desired classroom is available at the time and the capacity is enough for the course.
-                                        
-                                        
-                                        
-                                        
-                Searching and Filtering\s
-                                        
-                Students list: Click “Students” in order to see the list of students and select individually in order to see the student’s weekly schedule.
-                                        
-                Lecturers list:  Click “Lecturers” in order to see the list of lecturers and select individually in order to see the lecturer’s weekly schedule.
-                                        
-                Courses list: The list of courses is visible through the main menu. Click on a course to see its details such as Lecturer, Start Time, Duration, Classroom and the list of students that are taking that course.
-                                        
-                Classrooms list: The list of classrooms is visible through the main menu. The name of the classrooms and their capacities is visible directly. Click in a classroom to see its schedule.
-                
-                        """);
-        textFlow.getChildren().addAll(titleText, instructionsText);
+        Text titleText = new Text("Help Instructions\n\n");
+        titleText.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        // Main instructions text with bolded subtitles
+        Text instructionsText = new Text("Course Scheduler\n\n");
+        instructionsText.setStyle("-fx-font-weight: bold;");
+
+        Text descriptionText = new Text("""
+            This guide will help you navigate the key features of the program, including creating courses, importing sets of classes and courses, assigning courses to classrooms, and managing course-classroom relations.
+
+            """);
+
+        Text operationsTitle = new Text("Operations\n\n");
+        operationsTitle.setStyle("-fx-font-weight: bold;");
+
+        Text operationsText = new Text("""
+            - Create a course: Click “Add New Course” under the “Actions” menu. Enter details such as date/time, name, lecturer, classroom, duration, and students for the course.
+
+            - Import CSV file: Select “Import Courses” or “Import Classrooms” to load data from an existing CSV file. Navigate to the desired file path and choose the CSV file to import classrooms or courses.
+
+            - Add/Delete Students: Use “Add/Delete Student” to modify the list of students for a course. Select the course, choose the relevant students, and click “Add” or “Delete.”
+
+            - Assign classrooms automatically: Click “Assign Classroom” to allocate free courses to available classrooms automatically.
+
+            - Assign classrooms manually: Click “Assign Classroom,” select a course and a classroom, and click “Allocate.” The program will allocate the course if the classroom is available and has enough capacity.
+            
+            """);
+
+        Text searchTitle = new Text("Searching and Filtering\n\n");
+        searchTitle.setStyle("-fx-font-weight: bold;");
+
+        Text searchText = new Text("""
+            - Students List: Click “Students” to view the list of students. Select a student to see their weekly schedule.
+
+            - Lecturers List: Click “Lecturers” to view the list of lecturers. Select a lecturer to see their weekly schedule.
+
+            - Courses List: The main menu displays the list of courses. Click a course to view details such as Lecturer, Start Time, Duration, Classroom, and the student list.
+
+            - Classrooms List: The main menu displays the list of classrooms, including their names and capacities. Click a classroom to view its schedule.
+            
+            """);
+        Text linkText = new Text("For more information, visit ");
+        Hyperlink wikiLink = new Hyperlink("here.");
+        wikiLink.setStyle("-fx-text-fill: blue; -fx-underline: true;");
+        wikiLink.setOnAction(e -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/MahmutOzgurKizil/se302-course-scheduler/wiki"));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+
+        // Add all text elements to the TextFlow
+        textFlow.getChildren().addAll(titleText, instructionsText, descriptionText, operationsTitle, operationsText, searchTitle, searchText, linkText, wikiLink);
+
+        textFlow.setPadding(new Insets(10));
 
         ScrollPane scrollPane = new ScrollPane(textFlow);
         scrollPane.setFitToWidth(true);
         scrollPane.setPrefSize(400, 300);
+        scrollPane.setVvalue(1.0);
 
         Scene helpScene = new Scene(scrollPane);
         helpStage.setScene(helpScene);
+
+        helpStage.setOnShown(e -> {
+            Platform.runLater(() -> {
+                scrollPane.setVvalue(0);
+                textFlow.requestFocus();
+            });
+        });
+
         helpStage.show();
     }
 
