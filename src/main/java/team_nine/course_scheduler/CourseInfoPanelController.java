@@ -30,7 +30,8 @@ public class CourseInfoPanelController {
                 Start Time: %s
                 Duration: %s
                 Classroom: %s
-                """.formatted(course.getLecturer(), course.getTime_to_start(), course.getDuration(), classroom));
+                Student Count: %d
+                """.formatted(course.getLecturer(), course.getTime_to_start(), course.getDuration(), classroom, Database.getStudentNumber(course)));
 
         studentListView.setItems(FXCollections.observableArrayList(Database.getStudentsInCourse(course.getCourse())));
     }

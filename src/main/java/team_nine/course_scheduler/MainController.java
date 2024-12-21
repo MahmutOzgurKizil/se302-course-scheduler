@@ -619,6 +619,10 @@ public class MainController {
                     showErrorMessage("Course conflicts with %s's schedule.".formatted(student.getName()));
                     return;
                 }
+                else if (Database.getStudentNumber(selectedCourse) + selectedStudents.size() >= Database.getCapacity(new Classroom(Database.getAllocatedClassroom(selectedCourse.getCourse()), 0))) {
+                    showErrorMessage("Course is full.");
+                    return;
+                }
             }
             selectedCourse.addStudents(selectedStudents);
             updateStudentListForCourse(selectedCourse);

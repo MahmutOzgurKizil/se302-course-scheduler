@@ -36,7 +36,11 @@ public class Course {
 
         try {
             for (Classroom classroom : potentialClasses) {
-                if (isAvailable(classroom, course) && Database.getCapacity(classroom) >= Database.getStudentNumber(course)) {
+                if(Database.getAllocatedClassroom(course.course) != null){
+                    System.out.println("Course already assigned to a classroom.");
+                    return;
+                }
+                else if (isAvailable(classroom, course) && Database.getCapacity(classroom) >= Database.getStudentNumber(course)) {
                     Database.matchClassroom(course.course, classroom.getClassroom());
                     System.out.println(course.getCourse() + "Course successfully added to classroom: " +
                             classroom.getClassroom() + " at time: " + course.time_to_start);
