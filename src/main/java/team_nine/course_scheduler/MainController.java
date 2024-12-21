@@ -488,7 +488,7 @@ public class MainController {
         }
         Database.addCourse(courseName, day.concat(" "+time), hour,lecturer, studentNames);
         Database.matchClassroom(courseName,classroom);
-        showSuccessMessage("Course added successfully!");
+        showSuccessMessage("Course Added","Course added successfully!");
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
 
@@ -531,10 +531,10 @@ public class MainController {
         alert.showAndWait();
     }
 
-    private void showSuccessMessage(String message) {
+    private void showSuccessMessage(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");
-        alert.setHeaderText("Course Added");
+        alert.setHeaderText(title);
         alert.setContentText(message);
         alert.showAndWait();
     }
@@ -625,7 +625,7 @@ public class MainController {
             }
             selectedCourse.addStudents(selectedStudents);
             updateStudentListForCourse(selectedCourse);
-            showSuccessMessage("Selected students have been added to the course successfully!");
+            showSuccessMessage( "Students Added","Selected students have been added to the course successfully!");
         } else {
             System.out.println("No students selected to add.");
         }
@@ -644,7 +644,7 @@ public class MainController {
                 }
                 // Update the UI to reflect changes
                 updateStudentListForCourse(selectedCourse);
-                showSuccessMessage("Selected students have been removed from the course successfully!");
+                showSuccessMessage("Students Removed", "Selected students have been removed from the course successfully!");
                 selectedStudents.clear();
 
             } catch (Exception e) {
@@ -690,10 +690,10 @@ public class MainController {
         if (!selectedCourse.getCourse().isEmpty() && !selectedClassroom.getClassroom().isEmpty()) {
             try{
                 selectedCourse.manualAssign(selectedCourse, selectedClassroom);
-                showSuccessMessage("The course was successfully assigned to the classroom");
+                showSuccessMessage("","The course was successfully assigned to the classroom");
             }
             catch (Exception e) {
-                showErrorMessage("Error while matching the course to the classroom(Classroom might be busy at that time or the capacity might not be enough.");
+                showErrorMessage("Classroom might be busy at that time or the capacity might not be enough.");
             }
         } else {
             System.out.println("Please select both a course and a classroom.");
