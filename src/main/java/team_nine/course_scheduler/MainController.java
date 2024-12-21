@@ -459,14 +459,14 @@ public class MainController {
 
             for (Student student : students) {
                 Course[] studentCourses = Database.getCoursesForStudentAllInfo(student.getName());
-                if(doSchedulesConflict(student.getName(), newCourse, studentCourses)) return;
+                if(doSchedulesConflict(newCourse, studentCourses)) return;
             }
             {
                 Course[] lecturerCourses = Database.getCoursesForLecturerAllInfo(lecturer);
-                if (doSchedulesConflict(lecturer, newCourse, lecturerCourses)) return;
+                if (doSchedulesConflict(newCourse, lecturerCourses)) return;
 
                 Course[] classroomCourses = Database.getCoursesForClassroomAllInfo(classroom);
-                if (doSchedulesConflict(classroom, newCourse, classroomCourses)) return;
+                if (doSchedulesConflict(newCourse, classroomCourses)) return;
             }
 
             LocalTime latestEndTime = LocalTime.parse("23:11");
@@ -494,7 +494,7 @@ public class MainController {
 
     }
 
-    private boolean doSchedulesConflict(String classroom, Course newCourse, Course[] classroomCourses) {
+    private boolean doSchedulesConflict(Course newCourse, Course[] classroomCourses) {
         for (Course classroomCourse : classroomCourses) {
             String newCourseDay = newCourse.getTime_to_start().split(" ")[0];
             String classroomCourseDay = classroomCourse.getTime_to_start().split(" ")[0];
@@ -503,7 +503,6 @@ public class MainController {
                 LocalTime courseStartTime = LocalTime.parse(zeroPad(newCourse.getTime_to_start().split(" ")[1]));
                 LocalTime classroomCourseStartTime = LocalTime.parse(zeroPad(classroomCourse.getTime_to_start().split(" ")[1]));
                 if (doCoursesConflict(courseStartTime, newCourse.getDuration(), classroomCourseStartTime, classroomCourse.getDuration())) {
-                    showErrorMessage("Course conflicts with %s's schedule.".formatted(classroom));
                     return true;
                 }
             }
@@ -615,7 +614,7 @@ public class MainController {
         if (selectedCourse != null && !selectedStudents.isEmpty()) {
             for (Student student : selectedStudents) {
                 Course[] studentCourses = Database.getCoursesForStudentAllInfo(student.getName());
-                if (doSchedulesConflict(student.getName(), selectedCourse, studentCourses)){
+                if (doSchedulesConflict(selectedCourse, studentCourses)){
                     showErrorMessage("Course conflicts with %s's schedule.".formatted(student.getName()));
                     return;
                 }
@@ -626,6 +625,7 @@ public class MainController {
             }
             selectedCourse.addStudents(selectedStudents);
             updateStudentListForCourse(selectedCourse);
+            showSuccessMessage("Selected students have been added to the course successfully!");
         } else {
             System.out.println("No students selected to add.");
         }

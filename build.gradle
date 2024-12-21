@@ -4,6 +4,7 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'org.openjfx.javafxplugin' version '0.0.13'
     id 'org.beryx.jlink' version '2.25.0'
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group 'team_nine'
@@ -26,7 +27,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'team_nine.course_scheduler'
-    mainClass = 'team_nine.course_scheduler.Main'
+    mainClass = 'team_nine.course_scheduler.ProxyMain'
 }
 
 javafx {
